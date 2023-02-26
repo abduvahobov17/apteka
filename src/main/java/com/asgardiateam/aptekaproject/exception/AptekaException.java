@@ -25,4 +25,20 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(BAD_CREDENTIALS);
     }
 
+    public static AptekaException productNotFound() {
+        return new AptekaException(PRODUCT_NOT_FOUND);
+    }
+
+    public static AptekaException productSaveError() {
+        return new AptekaException(PRODUCT_SAVE_ERROR);
+    }
+
+    public static AptekaException productDeleteError() {
+        return new AptekaException(PRODUCT_DELETE_ERROR);
+    }
+
+    public static AptekaException unitTypeNotValid() {
+        return new AptekaException(UNIT_TYPE_NOT_VALID);
+    }
+
 }

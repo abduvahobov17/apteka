@@ -19,7 +19,6 @@ import java.util.Arrays;
 import static com.asgardiateam.aptekaproject.common.ResponseData.errorResponseData;
 import static com.asgardiateam.aptekaproject.constants.MessageKey.*;
 import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNullElse;
 import static org.springframework.http.ResponseEntity.badRequest;
 
 @Log4j2
