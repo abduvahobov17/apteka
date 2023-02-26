@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,8 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Arrays;
 
 import static com.asgardiateam.aptekaproject.common.ResponseData.errorResponseData;
-import static com.asgardiateam.aptekaproject.constants.MessageKey.INTERNAL_ERROR;
-import static com.asgardiateam.aptekaproject.constants.MessageKey.PARAMETERS_NOT_VALID;
+import static com.asgardiateam.aptekaproject.constants.MessageKey.*;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNullElse;
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -48,6 +48,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         return badRequest().body(errorResponseData(PARAMETERS_NOT_VALID));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> badCredentials(BadCredentialsException ex) {
+        log.error(ex);
+        return ResponseEntity.badRequest().body(errorResponseData(BAD_CREDENTIALS));
     }
 
     @ExceptionHandler(AptekaException.class)

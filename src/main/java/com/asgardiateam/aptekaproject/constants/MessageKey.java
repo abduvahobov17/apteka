@@ -19,6 +19,7 @@ public interface MessageKey {
     String UNEXPECTED_ERROR = "UNEXPECTED_ERROR";
     String INTERNAL_ERROR = "internal.error";
     String PARAMETERS_NOT_VALID = "parameters.not.valid";
+    String BAD_CREDENTIALS = "bad.credentials";
     String USER_NOT_FOUND_BY_TELEGRAM_ID = "user.not.found.by.telegram.id";
     String USER_NOT_FOUND_BY_ID = "user.not.found.by.id";
 }
