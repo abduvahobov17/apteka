@@ -4,6 +4,7 @@ import com.asgardiateam.aptekaproject.common.ThreadLocalSingleton;
 import com.asgardiateam.aptekaproject.config.security.CustomUserDetailsService;
 import com.asgardiateam.aptekaproject.constants.HeaderConstants;
 import com.asgardiateam.aptekaproject.entity.Admin;
+import com.asgardiateam.aptekaproject.exception.AptekaException;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,21 +37,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+            jwtTokenProvider.validateToken(jwt);
 
-                Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
-                Admin userDetails = customUserDetailsService.loadByUserId(userId);
+            Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
+            Admin userDetails = customUserDetailsService.loadByUserId(userId);
 
-                ThreadLocalSingleton.setUser(userDetails);
+            ThreadLocalSingleton.setUser(userDetails);
 
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
+            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
         } catch (Exception ex) {
             log.error("Could not set user authentication");
+            throw AptekaException.unauthorized();
         }
 
 
@@ -63,7 +65,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     String token = request.getHeader(HeaderConstants.AUTHORIZATION);
                     if (Objects.nonNull(token) && token.startsWith("Bearer") && token.length() > 8)
                         return token.substring(7);
-                    return null;
+                    throw AptekaException.unauthorized();
                 })
                 .onFailure(log::error)
                 .getOrNull();

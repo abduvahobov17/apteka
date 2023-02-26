@@ -37,6 +37,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(PRODUCT_DELETE_ERROR);
     }
 
+    public static AptekaException unauthorized() {
+        return new AptekaException(UNAUTHORIZED);
+    }
+
     public static AptekaException unitTypeNotValid() {
         return new AptekaException(UNIT_TYPE_NOT_VALID);
     }

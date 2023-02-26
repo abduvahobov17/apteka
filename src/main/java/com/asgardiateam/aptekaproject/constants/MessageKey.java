@@ -24,6 +24,7 @@ public interface MessageKey {
     String PRODUCT_SAVE_ERROR = "product.save.error";
     String PRODUCT_DELETE_ERROR = "product.delete.error";
     String USER_NOT_FOUND_BY_TELEGRAM_ID = "user.not.found.by.telegram.id";
+    String UNAUTHORIZED = "unauthorized";
     String USER_NOT_FOUND_BY_ID = "user.not.found.by.id";
     String NAME_NOT_VALID = "name.not.valid";
     String AMOUNT_NOT_VALID = "amount.not.valid";

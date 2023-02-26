@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.config.security.jwt;
 
 import com.asgardiateam.aptekaproject.constants.SecurityConstants;
 import com.asgardiateam.aptekaproject.entity.Admin;
+import com.asgardiateam.aptekaproject.exception.AptekaException;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
@@ -41,19 +42,18 @@ public class JWTTokenProvider {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(SecurityConstants.SECRET)
                     .parseClaimsJws(token);
-            return true;
         } catch (SignatureException |
                  MalformedJwtException |
                  ExpiredJwtException |
                  UnsupportedJwtException |
                  IllegalArgumentException ex) {
             log.error(ex.getMessage());
-            return false;
+            throw AptekaException.unauthorized();
         }
     }
 
@@ -63,7 +63,7 @@ public class JWTTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return (Long) claims.get("sub");
+        return Long.parseLong(String.valueOf(claims.get("sub")));
     }
 
 }

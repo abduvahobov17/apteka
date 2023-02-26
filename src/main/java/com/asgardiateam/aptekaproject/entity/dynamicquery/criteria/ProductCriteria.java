@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProductCriteria {
 
     private Long id;
