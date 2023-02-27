@@ -1,5 +1,6 @@
 package com.asgardiateam.aptekaproject.audit;
 
+import com.asgardiateam.aptekaproject.common.ThreadLocalSingleton;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +12,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -45,5 +44,17 @@ public abstract class AuditingEntity implements Serializable {
     @JsonIgnore
     private Instant lastModifiedDate;
 
+    @PrePersist
+    protected void onCreate() {
+        createdDate = Instant.ofEpochMilli(System.currentTimeMillis());
+        createdBy = ThreadLocalSingleton.getUser().getLogin();
+        lastModifiedDate = Instant.ofEpochMilli(System.currentTimeMillis());
+        lastModifiedBy = ThreadLocalSingleton.getUser().getLogin();
+    }
 
+    @PreUpdate
+    protected void onUpdate() {
+        lastModifiedDate = Instant.ofEpochMilli(System.currentTimeMillis());
+        lastModifiedBy = ThreadLocalSingleton.getUser().getLogin();
+    }
 }
