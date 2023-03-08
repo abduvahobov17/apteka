@@ -37,22 +37,21 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            jwtTokenProvider.validateToken(jwt);
+            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
 
-            Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
-            Admin userDetails = customUserDetailsService.loadByUserId(userId);
+                Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
+                Admin userDetails = customUserDetailsService.loadByUserId(userId);
 
-            ThreadLocalSingleton.setUser(userDetails);
+                ThreadLocalSingleton.setUser(userDetails);
 
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
         } catch (Exception ex) {
             log.error("Could not set user authentication");
-            throw AptekaException.unauthorized();
         }
 
 
@@ -65,7 +64,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     String token = request.getHeader(HeaderConstants.AUTHORIZATION);
                     if (Objects.nonNull(token) && token.startsWith("Bearer") && token.length() > 8)
                         return token.substring(7);
-                    throw AptekaException.unauthorized();
+                    return null;
                 })
                 .onFailure(log::error)
                 .getOrNull();

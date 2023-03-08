@@ -42,18 +42,19 @@ public class JWTTokenProvider {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(SecurityConstants.SECRET)
                     .parseClaimsJws(token);
+            return true;
         } catch (SignatureException |
-                 MalformedJwtException |
-                 ExpiredJwtException |
-                 UnsupportedJwtException |
-                 IllegalArgumentException ex) {
+                MalformedJwtException |
+                ExpiredJwtException |
+                UnsupportedJwtException |
+                IllegalArgumentException ex) {
             log.error(ex.getMessage());
-            throw AptekaException.unauthorized();
+            return false;
         }
     }
 
