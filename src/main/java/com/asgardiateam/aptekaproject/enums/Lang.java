@@ -1,5 +1,6 @@
 package com.asgardiateam.aptekaproject.enums;
 
+import com.asgardiateam.aptekaproject.exception.AptekaException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,13 @@ public enum Lang {
                 .filter(lang -> lang.getDescription().equals(description))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public static Lang tryFindLangByText(String text) {
+        return Arrays.stream(Lang.values())
+                .filter(x -> x.name().equals(text))
+                .findFirst()
+                .orElseThrow(AptekaException::langNotValid);
     }
 
 }

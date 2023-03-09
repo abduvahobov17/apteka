@@ -6,5 +6,7 @@ public interface ApiConstants {
 
     String PRODUCTS = "/products";
 
+    String USERS = "/users";
+
     String UNIT_TYPES = "/unit-types";
 }

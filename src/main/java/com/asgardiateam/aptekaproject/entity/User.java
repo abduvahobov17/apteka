@@ -51,9 +51,9 @@ public class User extends AuditingEntity {
     @Enumerated(EnumType.STRING)
     private ClientType clientType;
 
-    @Column(name = "user_type")
-    @Enumerated(EnumType.STRING)
-    private UserType userType;
+//    @Column(name = "user_type")
+//    @Enumerated(EnumType.STRING)
+//    private UserType userType;
 
     @Column(name = "language")
     @Enumerated(EnumType.STRING)

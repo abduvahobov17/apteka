@@ -1,5 +1,9 @@
 package com.asgardiateam.aptekaproject.enums;
 
+import com.asgardiateam.aptekaproject.exception.AptekaException;
+
+import java.util.Arrays;
+
 public enum BotState {
 
     START,
@@ -10,4 +14,11 @@ public enum BotState {
     SEARCH_PRODUCT,
     ADD_PRODUCT,
     CONFIRM_BUCKET;
+
+    public static BotState tryFindBotState(String text) {
+        return Arrays.stream(BotState.values())
+                .filter(x -> x.name().equals(text))
+                .findFirst()
+                .orElseThrow(AptekaException::botStateNotValid);
+    }
 }
