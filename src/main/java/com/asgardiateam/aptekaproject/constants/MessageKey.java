@@ -34,5 +34,7 @@ public interface MessageKey {
     String CLIENT_TYPE_NOT_VALID = "client.type.not.valid";
     String BOT_STATE_NOT_VALID = "bot.state.not.valid";
     String LANG_NOT_VALID = "lang.not.valid";
+    String USER_DELETE_EXCEPTION = "user.delete.exception";
+    String SUCCESS_MESSAGE = "success.message";
 
 }

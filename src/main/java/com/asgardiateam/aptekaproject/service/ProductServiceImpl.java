@@ -44,6 +44,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void deleteById(Long id) {
+        delete(findById(id));
+    }
+
+    @Override
     public Product findById(Long id) {
         return productRepository.findById(id).orElseThrow(AptekaException::productNotFound);
     }

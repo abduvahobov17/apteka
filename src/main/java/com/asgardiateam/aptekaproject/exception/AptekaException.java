@@ -57,4 +57,8 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(LANG_NOT_VALID);
     }
 
+    public static AptekaException deleteUserException() {
+        return new AptekaException(USER_DELETE_EXCEPTION);
+    }
+
 }
