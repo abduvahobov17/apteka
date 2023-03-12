@@ -45,4 +45,20 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(UNIT_TYPE_NOT_VALID);
     }
 
+    public static AptekaException clientTypeNotValid() {
+        return new AptekaException(CLIENT_TYPE_NOT_VALID);
+    }
+
+    public static AptekaException botStateNotValid() {
+        return new AptekaException(BOT_STATE_NOT_VALID);
+    }
+
+    public static AptekaException langNotValid() {
+        return new AptekaException(LANG_NOT_VALID);
+    }
+
+    public static AptekaException deleteUserException() {
+        return new AptekaException(USER_DELETE_EXCEPTION);
+    }
+
 }

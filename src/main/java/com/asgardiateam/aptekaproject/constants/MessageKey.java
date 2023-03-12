@@ -31,5 +31,10 @@ public interface MessageKey {
     String DESCRIPTION_NOT_VALID = "description.not.valid";
     String PRICE_NOT_VALID = "price.not.valid";
     String UNIT_TYPE_NOT_VALID = "unit.type.not.valid";
+    String CLIENT_TYPE_NOT_VALID = "client.type.not.valid";
+    String BOT_STATE_NOT_VALID = "bot.state.not.valid";
+    String LANG_NOT_VALID = "lang.not.valid";
+    String USER_DELETE_EXCEPTION = "user.delete.exception";
+    String SUCCESS_MESSAGE = "success.message";
 
 }

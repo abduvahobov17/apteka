@@ -3,8 +3,6 @@ package com.asgardiateam.aptekaproject.utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 public interface CrudService<ENTITY, DTO, REQUEST, ID, CRITERIA> {
 
     DTO create(REQUEST request);
@@ -12,6 +10,8 @@ public interface CrudService<ENTITY, DTO, REQUEST, ID, CRITERIA> {
     DTO update(REQUEST request, ID id);
 
     DTO getById(ID id);
+
+    void deleteById(ID id);
 
     PageDto<DTO> getAll(Pageable pageable, CRITERIA criteria);
 

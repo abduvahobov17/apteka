@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.service;
 
 import com.asgardiateam.aptekaproject.entity.User;
 import com.asgardiateam.aptekaproject.enums.BotState;
+import com.asgardiateam.aptekaproject.enums.ClientType;
 import com.asgardiateam.aptekaproject.enums.Lang;
 import com.asgardiateam.aptekaproject.service.interfaces.BotService;
 import com.asgardiateam.aptekaproject.service.interfaces.UserService;
@@ -53,7 +54,7 @@ public class BotServiceImpl implements BotService {
         user.setLastNameTeleg(update.getMessage().getFrom().getLastName());
         user.setUserNameTeleg(update.getMessage().getFrom().getUserName());
         user.setBotState(BotState.REGISTER_LANG);
-        userService.saveUser(user);
+        userService.save(user);
         sendMessage.setText(String.format(GREET, user.getFirstNameTeleg(), user.getFirstNameTeleg()));
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -83,7 +84,7 @@ public class BotServiceImpl implements BotService {
 
         user.setBotState(BotState.REGISTER_NAME);
         user.setLang(Lang.findByDescription(update.getMessage().getText()));
-        userService.saveUser(user);
+        userService.save(user);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(user.getLang().equals(Lang.RU) ? SEND_NAME_RU : SEND_NAME_UZ);
@@ -101,7 +102,7 @@ public class BotServiceImpl implements BotService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setBotState(REGISTER_PHONE);
-        userService.saveUser(user);
+        userService.save(user);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -129,7 +130,8 @@ public class BotServiceImpl implements BotService {
         phoneNumber = phoneNumber.startsWith("+") ? phoneNumber.substring(1) : phoneNumber;
         user.setPhoneNumber(phoneNumber);
         user.setBotState(MAIN_MENU);
-        userService.saveUser(user);
+        user.setClientType(ClientType.REGISTERED);
+        userService.save(user);
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(user.getLang().equals(Lang.RU) ? SUCCESS_REGISTRATION_RU : SUCCESS_REGISTRATION_UZ);

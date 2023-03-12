@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.controller;
 
 import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
 import com.asgardiateam.aptekaproject.enums.UnitType;
+import com.asgardiateam.aptekaproject.payload.MessageDTO;
 import com.asgardiateam.aptekaproject.payload.request.ProductRequest;
 import com.asgardiateam.aptekaproject.service.interfaces.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static com.asgardiateam.aptekaproject.common.ResponseData.ok;
 import static com.asgardiateam.aptekaproject.constants.ApiConstants.*;
+import static com.asgardiateam.aptekaproject.constants.MessageKey.SUCCESS_MESSAGE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -45,6 +47,12 @@ public class ProductController {
     public Object update(@RequestBody @Valid ProductRequest request,
                          @PathVariable Long productId) {
         return ok(productService.update(request, productId));
+    }
+
+    @DeleteMapping("/{productId}")
+    public Object delete(@PathVariable Long productId) {
+        productService.deleteById(productId);
+        return ok(new MessageDTO(SUCCESS_MESSAGE));
     }
 
     @GetMapping(UNIT_TYPES)
