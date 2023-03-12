@@ -59,16 +59,16 @@ public class UserController {
 
     @GetMapping(CLIENT_TYPES)
     public Object getClientTypes() {
-        return List.of(ClientType.values());
+        return ok(List.of(ClientType.values()));
     }
 
     @GetMapping(BOT_STATES)
     public Object getBotStates() {
-        return List.of(BotState.values());
+        return ok(List.of(BotState.values()));
     }
 
     @GetMapping(LANG_TYPES)
     public Object getLangTypes() {
-        return List.of(Lang.values());
+        return ok(List.of(Lang.values()));
     }
 }

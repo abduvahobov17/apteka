@@ -26,6 +26,7 @@ public final class UserSpecifications {
                 .and(createRegistrationTimeBetween(criteria.getStartRegisteredDate(), criteria.getEndRegisteredDate()))
                 .and(clientTypeEquals(criteria.getClientType()))
                 .and(langEquals(criteria.getLang()))
+                .and(phoneNumberLikeTo(criteria.getPhoneNumber()))
                 .and(botStateEquals(criteria.getBotState()));
     }
 
@@ -37,6 +38,11 @@ public final class UserSpecifications {
     public static Specification<User> firstNameLikeTo(String firstName) {
         return (root, query, criteriaBuilder) -> nonNull(firstName) ?
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), '%' + firstName.toLowerCase() + '%') : null;
+    }
+
+    public static Specification<User> phoneNumberLikeTo(String phoneNumber) {
+        return (root, query, criteriaBuilder) -> nonNull(phoneNumber) ?
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("phoneNumber")), '%' + phoneNumber.toLowerCase() + '%') : null;
     }
 
     public static Specification<User> lastNameLikeTo(String lastName) {

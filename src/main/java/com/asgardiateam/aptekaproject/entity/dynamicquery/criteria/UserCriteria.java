@@ -36,6 +36,8 @@ public class UserCriteria {
 
     private String userNameTeleg;
 
+    private String phoneNumber;
+
     private String telegramId;
 
     @JsonDeserialize(using = ClientDeserializer.class)

@@ -10,6 +10,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+
+    @Mapping(target = "registeredDate", expression = "java(user.getCreatedDate().toEpochMilli())")
     UserDTO toDTO(User user);
 
     @Mapping(target = "id", ignore = true)

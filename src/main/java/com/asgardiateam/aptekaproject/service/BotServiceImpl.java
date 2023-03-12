@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.service;
 
 import com.asgardiateam.aptekaproject.entity.User;
 import com.asgardiateam.aptekaproject.enums.BotState;
+import com.asgardiateam.aptekaproject.enums.ClientType;
 import com.asgardiateam.aptekaproject.enums.Lang;
 import com.asgardiateam.aptekaproject.service.interfaces.BotService;
 import com.asgardiateam.aptekaproject.service.interfaces.UserService;
@@ -129,6 +130,7 @@ public class BotServiceImpl implements BotService {
         phoneNumber = phoneNumber.startsWith("+") ? phoneNumber.substring(1) : phoneNumber;
         user.setPhoneNumber(phoneNumber);
         user.setBotState(MAIN_MENU);
+        user.setClientType(ClientType.REGISTERED);
         userService.save(user);
 
         SendMessage sendMessage = new SendMessage();
