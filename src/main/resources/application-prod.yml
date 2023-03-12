@@ -1,0 +1,16 @@
+asgardiateam:
+  telegram:
+    bot:
+      token: '6132565436:AAFIo4jysRetnG0GihnmCVmHGU1RV9lOabE'
+      username: '@aptekabeta_bot'
+
+spring:
+  datasource:
+    username: postgres
+    password: 5uzvO3vogcyKSk9JkhFa0vwkfPFJob7V
+    url: "jdbc:postgresql://postgres:5432/apteka"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
