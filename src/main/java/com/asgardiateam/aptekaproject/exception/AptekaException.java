@@ -45,6 +45,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(UNIT_TYPE_NOT_VALID);
     }
 
+    public static AptekaException statusNotValid() {
+        return new AptekaException(STATUS_NOT_VALID);
+    }
+
     public static AptekaException clientTypeNotValid() {
         return new AptekaException(CLIENT_TYPE_NOT_VALID);
     }

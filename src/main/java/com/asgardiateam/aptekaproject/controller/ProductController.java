@@ -21,7 +21,7 @@ import static com.asgardiateam.aptekaproject.constants.MessageKey.SUCCESS_MESSAG
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = API_V1 + PRODUCTS, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = API_V1 + PRODUCTS, produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -38,12 +38,12 @@ public class ProductController {
         return ok(productService.getById(productId));
     }
 
-    @PostMapping
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public Object create(@RequestBody @Valid ProductRequest request) {
         return ok(productService.create(request));
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping(consumes = APPLICATION_JSON_VALUE, path = "/{productId}")
     public Object update(@RequestBody @Valid ProductRequest request,
                          @PathVariable Long productId) {
         return ok(productService.update(request, productId));

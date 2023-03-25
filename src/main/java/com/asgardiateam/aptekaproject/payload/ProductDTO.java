@@ -1,5 +1,6 @@
 package com.asgardiateam.aptekaproject.payload;
 
+import com.asgardiateam.aptekaproject.enums.Status;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,12 @@ public class ProductDTO {
     private String name;
 
     private Long amount;
+
+    private String phoneNumber;
+
+    private String supplier;
+
+    private Status status;
 
     private String description;
 

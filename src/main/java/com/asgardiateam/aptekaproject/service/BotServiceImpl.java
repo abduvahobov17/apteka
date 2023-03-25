@@ -1,12 +1,20 @@
 package com.asgardiateam.aptekaproject.service;
 
+import com.asgardiateam.aptekaproject.entity.Product;
 import com.asgardiateam.aptekaproject.entity.User;
+import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
 import com.asgardiateam.aptekaproject.enums.BotState;
 import com.asgardiateam.aptekaproject.enums.ClientType;
 import com.asgardiateam.aptekaproject.enums.Lang;
+import com.asgardiateam.aptekaproject.payload.ProductDTO;
 import com.asgardiateam.aptekaproject.service.interfaces.BotService;
+import com.asgardiateam.aptekaproject.service.interfaces.ProductService;
 import com.asgardiateam.aptekaproject.service.interfaces.UserService;
+import com.asgardiateam.aptekaproject.utils.Page2Dto;
+import com.asgardiateam.aptekaproject.utils.PageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Contact;
@@ -23,6 +31,7 @@ import java.util.function.BiFunction;
 
 import static com.asgardiateam.aptekaproject.constants.MessageKey.*;
 import static com.asgardiateam.aptekaproject.enums.BotState.*;
+import static com.asgardiateam.aptekaproject.enums.Lang.RU;
 import static com.asgardiateam.aptekaproject.enums.Lang.tryFindLang;
 import static java.util.Objects.isNull;
 
@@ -31,6 +40,7 @@ import static java.util.Objects.isNull;
 public class BotServiceImpl implements BotService {
 
     private final UserService userService;
+    private final ProductService productService;
 
     Map<BotState, BiFunction<Update, User, SendMessage>> sendMessageMethods = new ConcurrentHashMap<>();
 
@@ -39,6 +49,8 @@ public class BotServiceImpl implements BotService {
         sendMessageMethods.put(REGISTER_LANG, this::registerLanguage);
         sendMessageMethods.put(REGISTER_PHONE, this::registerPhone);
         sendMessageMethods.put(REGISTER_NAME, this::registerName);
+        sendMessageMethods.put(MAIN_MENU, this::mainMenu);
+        sendMessageMethods.put(SEARCH_PRODUCT_START, this::searchStart);
     }
 
     @Override
@@ -95,6 +107,7 @@ public class BotServiceImpl implements BotService {
     public SendMessage registerName(Update update, User user) {
 
         String chatId = getChatId(update);
+        boolean isRu = user.getLang().equals(RU);
         String[] fullName = update.getMessage().getText().trim().toUpperCase().split(" ");
         String firstName = fullName[0];
         String lastName = fullName[1];
@@ -106,7 +119,7 @@ public class BotServiceImpl implements BotService {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText(user.getLang().equals(Lang.RU) ? SEND_PHONE_RU : SEND_PHONE_UZ);
+        sendMessage.setText(isRu ? SEND_PHONE_RU : SEND_PHONE_UZ);
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -126,6 +139,7 @@ public class BotServiceImpl implements BotService {
     public SendMessage registerPhone(Update update, User user) {
         String chatId = getChatId(update);
         Contact contact = update.getMessage().getContact();
+        boolean isRu = user.getLang().equals(RU);
         String phoneNumber = contact.getPhoneNumber();
         phoneNumber = phoneNumber.startsWith("+") ? phoneNumber.substring(1) : phoneNumber;
         user.setPhoneNumber(phoneNumber);
@@ -134,7 +148,7 @@ public class BotServiceImpl implements BotService {
         userService.save(user);
 
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setText(user.getLang().equals(Lang.RU) ? SUCCESS_REGISTRATION_RU : SUCCESS_REGISTRATION_UZ);
+        sendMessage.setText(isRu ? SUCCESS_REGISTRATION_RU : SUCCESS_REGISTRATION_UZ);
         sendMessage.setChatId(chatId);
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
@@ -143,12 +157,12 @@ public class BotServiceImpl implements BotService {
 
         KeyboardRow row = new KeyboardRow();
         KeyboardButton button = new KeyboardButton();
-        button.setText(user.getLang().equals(Lang.RU) ? SETTINGS_RU : SETTINGS_UZ);
+        button.setText(isRu ? SETTINGS_RU : SETTINGS_UZ);
         row.add(button);
         rows.add(row);
         row = new KeyboardRow();
         button = new KeyboardButton();
-        button.setText(user.getLang().equals(Lang.RU) ? SEARCH_PRODUCT_RU : SEARCH_PRODUCT_UZ);
+        button.setText(isRu ? SEARCH_PRODUCT_RU : SEARCH_PRODUCT_UZ);
         row.add(button);
         rows.add(row);
 
@@ -158,12 +172,77 @@ public class BotServiceImpl implements BotService {
         return sendMessage;
     }
 
-    public SendMessage search(Update update) {
-        return null;
+    public SendMessage mainMenu(Update update, User user) {
+        String chatId = getChatId(update);
+        String text = update.getMessage().getText();
+        boolean isRu = user.getLang().equals(RU);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (text.equals(SEARCH_PRODUCT_RU) || text.equals(SEARCH_PRODUCT_UZ)) {
+            user.setBotState(SEARCH_PRODUCT_START);
+            sendMessage.setText(isRu ? SEARCH_PRODUCT_START_RU : SEARCH_PRODUCT_START_UZ);
+        } else if (text.equals(SETTINGS_RU) || text.equals(SETTINGS_UZ)) {
+            user.setBotState(SETTINGS);
+            sendMessage.setText(isRu ? SETTINGS_START_RU : SETTINGS_START_UZ);
+        } else {
+            sendMessage.setText(isRu ? CHOOSE_ERROR_RU : CHOOSE_ERROR_UZ);
+        }
+        userService.save(user);
+        return sendMessage;
+    }
+
+    public SendMessage searchStart(Update update, User user) {
+        String chatId = getChatId(update);
+        boolean isRu = user.getLang().equals(RU);
+        String productName = update.getMessage().getText();
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (productName.length() < 3) {
+            sendMessage.setText(user.getLang().equals(RU) ? INVALID_DATA_RU : INVALID_DATA_UZ);
+            return sendMessage;
+        }
+
+        PageDto<ProductDTO> allProducts = productService.getAll(Pageable.ofSize(5), ProductCriteria.builder().name(productName).build());
+
+        if (allProducts.getItems().isEmpty()) {
+            sendMessage.setText(isRu ? PRODUCT_NOT_FOUND_RU : PRODUCT_NOT_FOUND_UZ);
+            return sendMessage;
+        }
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setSelective(true);
+        getAllProductList(replyKeyboardMarkup, user.getLang(), allProducts);
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        sendMessage.setText(isRu ? CHOOSE_PRODUCT_RU : CHOOSE_PRODUCT_UZ);
+        return sendMessage;
     }
 
     private String getChatId(Update update) {
         return String.valueOf(update.getMessage().getChatId());
+    }
+
+    private void getAllProductList(ReplyKeyboardMarkup replyKeyboardMarkup, Lang lang, PageDto<ProductDTO> allProducts) {
+        List<KeyboardRow> rows = new ArrayList<>();
+        for (ProductDTO product : allProducts.getItems()) {
+            KeyboardRow row = new KeyboardRow();
+            KeyboardButton button = new KeyboardButton();
+            button.setText(product.getName());
+            row.add(button);
+            rows.add(row);
+        }
+        String emptyText = lang.equals(RU) ? EMPTY_RU : EMPTY_UZ;
+        KeyboardRow row = new KeyboardRow();
+        KeyboardButton previous = new KeyboardButton(emptyText);
+        KeyboardButton current = new KeyboardButton(String.valueOf(allProducts.getPageNumber()));
+        KeyboardButton next = new KeyboardButton(emptyText);
+        if (allProducts.isPrevious())
+            previous.setText(PREVIOUS);
+        if (allProducts.isNext())
+            next.setText(NEXT);
+        row.addAll(List.of(previous, current, next));
+        rows.add(row);
+        replyKeyboardMarkup.setKeyboard(rows);
     }
 
 }
