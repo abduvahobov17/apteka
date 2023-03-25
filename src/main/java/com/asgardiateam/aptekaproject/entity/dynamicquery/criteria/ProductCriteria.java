@@ -18,13 +18,15 @@ public class ProductCriteria {
 
     private String name;
 
-    private Long fromAmount;
+    @Builder.Default
+    private Long fromAmount = 0L;
 
     private Long toAmount;
 
     private String description;
 
-    private Long fromPrice;
+    @Builder.Default
+    private Long fromPrice = 0L;
 
     private Long toPrice;
 

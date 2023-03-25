@@ -1,6 +1,7 @@
 package com.asgardiateam.aptekaproject.entity;
 
 import com.asgardiateam.aptekaproject.audit.AuditingEntity;
+import com.asgardiateam.aptekaproject.enums.Status;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +36,17 @@ public class Product extends AuditingEntity {
     @Column(name = "price")
     private Long price;
 
+    @Column(name = "supplier")
+    private String supplier;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "unit_type")
     @Enumerated(EnumType.STRING)
     private UnitType unitType;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }
