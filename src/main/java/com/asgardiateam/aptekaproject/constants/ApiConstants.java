@@ -10,6 +10,8 @@ public interface ApiConstants {
 
     String UNIT_TYPES = "/unit-types";
 
+    String STATUSES = "/statuses";
+
     String CLIENT_TYPES = "/client-types";
 
     String BOT_STATES = "/bot-states";
