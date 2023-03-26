@@ -1,6 +1,7 @@
 package com.asgardiateam.aptekaproject.controller;
 
 import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
+import com.asgardiateam.aptekaproject.enums.Status;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import com.asgardiateam.aptekaproject.payload.MessageDTO;
 import com.asgardiateam.aptekaproject.payload.request.ProductRequest;
@@ -58,5 +59,10 @@ public class ProductController {
     @GetMapping(UNIT_TYPES)
     public Object getUnitTypes() {
         return ok(List.of(UnitType.values()));
+    }
+
+    @GetMapping(STATUSES)
+    public Object getStatuses() {
+        return ok(List.of(Status.values()));
     }
 }
