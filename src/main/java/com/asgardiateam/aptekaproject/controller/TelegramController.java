@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class TelegramController extends TelegramLongPollingBot {
@@ -28,7 +30,13 @@ public class TelegramController extends TelegramLongPollingBot {
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        execute(botService.executeMethod(update, userService.userByTelegramId(String.valueOf(update.getMessage().getChatId()))));
+
+        String chatId = String.valueOf(update.hasCallbackQuery() ? update.getCallbackQuery().getMessage().getChatId() :
+                update.getMessage().getChatId());
+
+        execute(botService
+                .executeMethod(update, userService
+                        .userByTelegramId(chatId)));
     }
 
 }

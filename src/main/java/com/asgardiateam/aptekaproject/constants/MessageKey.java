@@ -21,10 +21,26 @@ public interface MessageKey {
     String CHOOSE_PRODUCT_UZ = "Mahsulotni tanlang";
     String PRODUCT_NOT_FOUND_RU = "Продукт не найден";
     String PRODUCT_NOT_FOUND_UZ = "Mahsulot topilmadi";
+    String THANKS_FOR_USING_BOT_RU = "Спасибо за использование нашего бота";
+    String THANKS_FOR_USING_BOT_UZ = "Botimizni ishlatganiz uchun raxmat";
+    String MINUS = "➖";
+    String PLUS = "➕";
+    String TO_BUCKET_RU = "В карзину";
+    String TO_BUCKET_UZ = "Savatga";
+    String IN_BUCKET_RU = "В карзине✅";
+    String IN_BUCKET_UZ = "Savatda✅";
+    String CANCELLED_RU = "Отменено❌";
+    String CANCELLED_UZ = "Qaytarildi❌";
     String EMPTY_RU = "Пусто";
+    String CANCEL_RU = "ОТМЕНИТЬ";
+    String CANCEL_UZ = "QAYTARMOQ";
     String EMPTY_UZ = "Bo'sh";
     String NEXT = "➡️";
     String PREVIOUS = "⬅️";
+    String PRODUCT_NAME_RU = "Название продукта";
+    String PRODUCT_NAME_UZ = "Mahsulot nomi";
+    String PRODUCT_DESCRIPTION_RU = "Описание продукта";
+    String PRODUCT_DESCRIPTION_UZ = "Mahsulot haqida malumot";
 
     String SETTINGS_RU = "Настройки ⚙️";
     String SETTINGS_UZ = "Sozlamalar ⚙️";
@@ -52,6 +68,7 @@ public interface MessageKey {
     String UNIT_TYPE_NOT_VALID = "unit.type.not.valid";
     String CLIENT_TYPE_NOT_VALID = "client.type.not.valid";
     String BOT_STATE_NOT_VALID = "bot.state.not.valid";
+    String BUCKET_PRODUCT_NOT_FOUND = "bucket.product.not.found";
     String LANG_NOT_VALID = "lang.not.valid";
     String USER_DELETE_EXCEPTION = "user.delete.exception";
     String SUCCESS_MESSAGE = "success.message";

@@ -1,33 +1,40 @@
 package com.asgardiateam.aptekaproject.service;
 
+import com.asgardiateam.aptekaproject.entity.Bucket;
+import com.asgardiateam.aptekaproject.entity.BucketProduct;
 import com.asgardiateam.aptekaproject.entity.Product;
 import com.asgardiateam.aptekaproject.entity.User;
 import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
 import com.asgardiateam.aptekaproject.enums.BotState;
+import com.asgardiateam.aptekaproject.enums.BucketProductStatus;
 import com.asgardiateam.aptekaproject.enums.ClientType;
 import com.asgardiateam.aptekaproject.enums.Lang;
 import com.asgardiateam.aptekaproject.payload.ProductDTO;
-import com.asgardiateam.aptekaproject.service.interfaces.BotService;
-import com.asgardiateam.aptekaproject.service.interfaces.ProductService;
-import com.asgardiateam.aptekaproject.service.interfaces.UserService;
-import com.asgardiateam.aptekaproject.utils.Page2Dto;
+import com.asgardiateam.aptekaproject.service.interfaces.*;
 import com.asgardiateam.aptekaproject.utils.PageDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Contact;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.asgardiateam.aptekaproject.constants.MessageKey.*;
 import static com.asgardiateam.aptekaproject.enums.BotState.*;
@@ -41,8 +48,12 @@ public class BotServiceImpl implements BotService {
 
     private final UserService userService;
     private final ProductService productService;
+    private final BucketService bucketService;
+    private final BucketProductService bucketProductService;
 
     Map<BotState, BiFunction<Update, User, SendMessage>> sendMessageMethods = new ConcurrentHashMap<>();
+
+    Map<BotState, BiFunction<CallbackQuery, Lang, EditMessageReplyMarkup>> editReplyMarkup = new ConcurrentHashMap<>();
 
     {
         sendMessageMethods.put(START, this::greet);
@@ -51,11 +62,19 @@ public class BotServiceImpl implements BotService {
         sendMessageMethods.put(REGISTER_NAME, this::registerName);
         sendMessageMethods.put(MAIN_MENU, this::mainMenu);
         sendMessageMethods.put(SEARCH_PRODUCT_START, this::searchStart);
+        sendMessageMethods.put(SEARCH_PRODUCT_PROGRESS, this::searchProgress);
+    }
+
+    {
+        editReplyMarkup.put(SEARCH_PRODUCT_PROGRESS, this::updateCallBackQueryProductOrder);
     }
 
     @Override
-    public SendMessage executeMethod(Update update, User user) {
-        return sendMessageMethods.get(user.getBotState()).apply(update, user);
+    public BotApiMethod<? extends Serializable> executeMethod(Update update, User user) {
+        if(update.hasCallbackQuery())
+            return editReplyMarkup.get(user.getBotState()).apply(update.getCallbackQuery(), user.getLang());
+        else
+            return sendMessageMethods.get(user.getBotState()).apply(update, user);
     }
 
     public SendMessage greet(Update update, User user) {
@@ -202,7 +221,7 @@ public class BotServiceImpl implements BotService {
             return sendMessage;
         }
 
-        PageDto<ProductDTO> allProducts = productService.getAll(Pageable.ofSize(5), ProductCriteria.builder().name(productName).build());
+        PageDto<ProductDTO> allProducts = productService.getAll(Pageable.unpaged(), ProductCriteria.builder().name(productName).fromAmount(0L).fromPrice(0L).build());
 
         if (allProducts.getItems().isEmpty()) {
             sendMessage.setText(isRu ? PRODUCT_NOT_FOUND_RU : PRODUCT_NOT_FOUND_UZ);
@@ -215,6 +234,72 @@ public class BotServiceImpl implements BotService {
         getAllProductList(replyKeyboardMarkup, user.getLang(), allProducts);
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
         sendMessage.setText(isRu ? CHOOSE_PRODUCT_RU : CHOOSE_PRODUCT_UZ);
+        user.setBotState(SEARCH_PRODUCT_PROGRESS);
+        userService.save(user);
+        return sendMessage;
+    }
+
+    public SendMessage searchProgress(Update update, User user) {
+        String chatId = getChatId(update);
+        String action = update.getMessage().getText();
+        boolean isRu = user.getLang().equals(RU);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (action.equals(CANCEL_RU) || action.equals(CANCEL_UZ)) {
+            sendMessage = registerPhone(update, user);
+            sendMessage.setText(isRu ? THANKS_FOR_USING_BOT_RU : THANKS_FOR_USING_BOT_UZ);
+            return sendMessage;
+        }
+
+        Optional<Product> product = productService.findByName(action);
+        if (product.isEmpty()) {
+            sendMessage.setText(isRu ? PRODUCT_NOT_FOUND_RU : PRODUCT_NOT_FOUND_UZ);
+            return sendMessage;
+        }
+
+        Bucket bucket = bucketService.getBucketByUserId(user.getId())
+                .orElseGet(Bucket::new);
+        bucket = bucketService.save(bucket);
+
+        BucketProduct bucketProduct = new BucketProduct();
+        bucket.getBucketProducts().add(bucketProduct);
+        bucketProduct.setBucket(bucket);
+        bucketProduct.setProduct(product.get());
+        bucketProduct.setAmount(0L);
+        BucketProduct savedBucketProduct = bucketProductService.save(bucketProduct);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> listListButton = new ArrayList<>();
+        List<InlineKeyboardButton> inlineKeyboardButtons = new ArrayList<>();
+        InlineKeyboardButton minus = new InlineKeyboardButton();
+        minus.setText(MINUS);
+        minus.setCallbackData(MINUS + "/" + savedBucketProduct.getId());
+        inlineKeyboardButtons.add(minus);
+        InlineKeyboardButton amount = new InlineKeyboardButton();
+        amount.setText(String.valueOf(savedBucketProduct.getAmount()));
+        amount.setCallbackData("hello");
+        inlineKeyboardButtons.add(amount);
+        InlineKeyboardButton plus = new InlineKeyboardButton();
+        plus.setText(PLUS);
+        plus.setCallbackData(PLUS + "/" + savedBucketProduct.getId());
+        inlineKeyboardButtons.add(plus);
+        listListButton.add(inlineKeyboardButtons);
+
+        List<InlineKeyboardButton> inlineKeyboardButtonsBucket = new ArrayList<>();
+        InlineKeyboardButton toBucket = new InlineKeyboardButton();
+        toBucket.setText(isRu
+                ? (TO_BUCKET_RU)
+                : (TO_BUCKET_UZ));
+        toBucket.setCallbackData(isRu
+                ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
+                : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+        inlineKeyboardButtonsBucket.add(toBucket);
+        listListButton.add(inlineKeyboardButtonsBucket);
+
+        inlineKeyboardMarkup.setKeyboard(listListButton);
+
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+        sendMessage.setText(getProductDescription(user.getLang(), product.get()));
         return sendMessage;
     }
 
@@ -231,18 +316,98 @@ public class BotServiceImpl implements BotService {
             row.add(button);
             rows.add(row);
         }
-        String emptyText = lang.equals(RU) ? EMPTY_RU : EMPTY_UZ;
+
         KeyboardRow row = new KeyboardRow();
-        KeyboardButton previous = new KeyboardButton(emptyText);
-        KeyboardButton current = new KeyboardButton(String.valueOf(allProducts.getPageNumber()));
-        KeyboardButton next = new KeyboardButton(emptyText);
-        if (allProducts.isPrevious())
-            previous.setText(PREVIOUS);
-        if (allProducts.isNext())
-            next.setText(NEXT);
-        row.addAll(List.of(previous, current, next));
+        KeyboardButton cancel = new KeyboardButton(lang.equals(RU) ? CANCEL_RU : CANCEL_UZ);
+        row.add(cancel);
         rows.add(row);
         replyKeyboardMarkup.setKeyboard(rows);
+    }
+
+    private String getProductDescription(Lang lang, Product product) {
+        return lang.equals(RU) ? PRODUCT_NAME_RU + ": " + product.getName() + "\n" +
+                PRODUCT_DESCRIPTION_RU + ": " + product.getDescription()
+                : PRODUCT_NAME_UZ + ": " + product.getName() + "\n" +
+                PRODUCT_DESCRIPTION_UZ + ": " + product.getDescription();
+    }
+
+    public EditMessageReplyMarkup updateCallBackQueryProductOrder(CallbackQuery callbackQuery, Lang lang) {
+        String data = callbackQuery.getData();
+        EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup();
+        editMessageReplyMarkup.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
+
+        BucketProduct bucketProduct = bucketProductService.findById(Long.valueOf(data.split("/")[1]));
+
+        List<InlineKeyboardButton> bucketButton = new ArrayList<>();
+
+        if (data.contains(PLUS))
+            bucketProduct.setAmount(bucketProduct.getAmount() + 1);
+
+        if (data.contains(MINUS) && bucketProduct.getAmount() > 0)
+            bucketProduct.setAmount(bucketProduct.getAmount() - 1);
+        if (data.contains(TO_BUCKET_RU) || data.contains(TO_BUCKET_UZ)) {
+            bucketProduct.setStatus(BucketProductStatus.CHOSEN);
+            bucketButton = new ArrayList<>();
+            InlineKeyboardButton toBucket = new InlineKeyboardButton();
+            toBucket.setText(data.contains(TO_BUCKET_RU)
+                    ? (IN_BUCKET_RU)
+                    : (IN_BUCKET_UZ));
+            toBucket.setCallbackData(data.contains(TO_BUCKET_RU)
+                    ? (IN_BUCKET_RU+"/"+bucketProduct.getId())
+                    : (IN_BUCKET_UZ+"/"+bucketProduct.getId()));
+            bucketButton.add(toBucket);
+        } else if (data.contains(IN_BUCKET_RU) || data.contains(IN_BUCKET_UZ)) {
+            bucketProduct.setStatus(BucketProductStatus.REVIEWED);
+            bucketButton = new ArrayList<>();
+            InlineKeyboardButton toBucket = new InlineKeyboardButton();
+            toBucket.setText(data.contains(IN_BUCKET_RU)
+                    ? (TO_BUCKET_RU)
+                    : (TO_BUCKET_UZ));
+            toBucket.setCallbackData(data.contains(IN_BUCKET_RU)
+                    ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
+                    : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+            bucketButton.add(toBucket);
+        } else {
+            bucketButton = new ArrayList<>();
+            InlineKeyboardButton toBucket = new InlineKeyboardButton();
+            toBucket.setText(lang.equals(RU)
+                    ? (TO_BUCKET_RU)
+                    : (TO_BUCKET_UZ));
+            toBucket.setCallbackData(lang.equals(RU)
+                    ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
+                    : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+            bucketButton.add(toBucket);
+        }
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> listListButton = new ArrayList<>();
+
+        List<InlineKeyboardButton> inlineKeyboardButtons = new ArrayList<>();
+
+        InlineKeyboardButton minus = new InlineKeyboardButton();
+        minus.setText(MINUS);
+        minus.setCallbackData(MINUS + "/" + bucketProduct.getId());
+        inlineKeyboardButtons.add(minus);
+        InlineKeyboardButton amount = new InlineKeyboardButton();
+        amount.setText(String.valueOf(bucketProduct.getAmount()));
+        amount.setCallbackData("hello");
+        inlineKeyboardButtons.add(amount);
+        InlineKeyboardButton plus = new InlineKeyboardButton();
+        plus.setText(PLUS);
+        plus.setCallbackData(PLUS + "/" + bucketProduct.getId());
+        inlineKeyboardButtons.add(plus);
+        listListButton.add(inlineKeyboardButtons);
+        listListButton.add(bucketButton);
+
+        inlineKeyboardMarkup.setKeyboard(listListButton);
+
+        bucketProductService.save(bucketProduct);
+
+        editMessageReplyMarkup.setReplyMarkup(inlineKeyboardMarkup);
+        editMessageReplyMarkup.setInlineMessageId(callbackQuery.getInlineMessageId());
+        editMessageReplyMarkup.setMessageId(callbackQuery.getMessage().getMessageId());
+
+        return editMessageReplyMarkup;
     }
 
 }
