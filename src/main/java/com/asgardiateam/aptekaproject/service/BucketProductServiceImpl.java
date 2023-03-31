@@ -7,6 +7,8 @@ import com.asgardiateam.aptekaproject.service.interfaces.BucketProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BucketProductServiceImpl implements BucketProductService {
@@ -22,5 +24,15 @@ public class BucketProductServiceImpl implements BucketProductService {
     public BucketProduct findById(Long id) {
         return bucketProductRepository.findById(id)
                 .orElseThrow(AptekaException::bucketProductNotFound);
+    }
+
+    @Override
+    public void deleteAll(List<BucketProduct> bucketProducts) {
+        bucketProductRepository.deleteAll(bucketProducts);
+    }
+
+    @Override
+    public void delete(BucketProduct bucketProduct) {
+        bucketProductRepository.delete(bucketProduct);
     }
 }

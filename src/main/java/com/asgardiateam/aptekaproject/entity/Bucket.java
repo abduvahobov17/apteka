@@ -22,12 +22,15 @@ public class Bucket extends AuditingEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "amount")
-    private Long amount;
-
     @Column(name = "bucket_status")
     @Enumerated(EnumType.STRING)
     private BucketStatus bucketStatus;
+
+    @Column(name = "lon")
+    private Double lon;
+
+    @Column(name = "lat")
+    private Double lat;
 
     @Builder.Default
     @OneToMany(mappedBy = "bucket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

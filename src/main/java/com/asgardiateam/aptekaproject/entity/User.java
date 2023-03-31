@@ -47,6 +47,12 @@ public class User extends AuditingEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "lon")
+    private Long lon;
+
+    @Column(name = "lat")
+    private Long lat;
+
     @Column(name = "client_type")
     @Enumerated(EnumType.STRING)
     private ClientType clientType;
