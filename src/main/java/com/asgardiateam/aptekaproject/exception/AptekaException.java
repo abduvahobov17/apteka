@@ -69,4 +69,7 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(USER_DELETE_EXCEPTION);
     }
 
+    public static AptekaException bucketNotFound() {
+        return new AptekaException(BUCKET_NOT_FOUND);
+    }
 }

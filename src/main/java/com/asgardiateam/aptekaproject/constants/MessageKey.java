@@ -96,6 +96,7 @@ public interface MessageKey {
     String BUCKET_PRODUCT_NOT_FOUND = "bucket.product.not.found";
     String LANG_NOT_VALID = "lang.not.valid";
     String USER_DELETE_EXCEPTION = "user.delete.exception";
+    String BUCKET_NOT_FOUND = "bucket.not.found";
     String SUCCESS_MESSAGE = "success.message";
 
 }
