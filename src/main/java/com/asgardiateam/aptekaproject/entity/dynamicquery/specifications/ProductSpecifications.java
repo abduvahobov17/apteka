@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.entity.dynamicquery.specifications;
 
 import com.asgardiateam.aptekaproject.entity.Product;
 import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
+import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -15,6 +16,7 @@ public final class ProductSpecifications {
                 .and(amountAround(productCriteria.getFromAmount(), productCriteria.getToAmount()))
                 .and(descriptionLikeTo(productCriteria.getDescription()))
                 .and(priceAround(productCriteria.getFromPrice(), productCriteria.getToPrice()))
+                .and(stateEquals())
                 .and(unitTypeEquals(productCriteria.getUnitType()));
     }
 
@@ -48,5 +50,9 @@ public final class ProductSpecifications {
     public static Specification<Product> unitTypeEquals(UnitType unitType) {
         return (root, query, criteriaBuilder) -> unitType != null ?
                 criteriaBuilder.equal(root.get("unitType"), unitType.name()) : null;
+    }
+
+    public static Specification<Product> stateEquals() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("state"), State.ALIVE);
     }
 }

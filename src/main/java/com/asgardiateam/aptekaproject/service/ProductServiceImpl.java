@@ -3,6 +3,7 @@ package com.asgardiateam.aptekaproject.service;
 import com.asgardiateam.aptekaproject.entity.Product;
 import com.asgardiateam.aptekaproject.entity.dynamicquery.criteria.ProductCriteria;
 import com.asgardiateam.aptekaproject.entity.dynamicquery.specifications.ProductSpecifications;
+import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.asgardiateam.aptekaproject.mapper.ProductMapper;
 import com.asgardiateam.aptekaproject.payload.ProductDTO;
@@ -16,12 +17,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+
+    @Override
+    public Optional<Product> findByName(String name) {
+        return productRepository.findByNameAndState(name, State.ALIVE);
+    }
 
     @Override
     public ProductDTO create(ProductRequest productRequest) {
@@ -50,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product findById(Long id) {
-        return productRepository.findById(id).orElseThrow(AptekaException::productNotFound);
+        return productRepository.findByIdAndState(id, State.ALIVE).orElseThrow(AptekaException::productNotFound);
     }
 
     @Override
@@ -70,7 +79,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Product product) {
         try {
-            productRepository.delete(product);
+            product.setState(State.DELETED);
+            productRepository.save(product);
         } catch (Exception e) {
             throw AptekaException.productDeleteError();
         }

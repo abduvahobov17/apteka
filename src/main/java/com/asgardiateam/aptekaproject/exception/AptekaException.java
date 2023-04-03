@@ -57,6 +57,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(BOT_STATE_NOT_VALID);
     }
 
+    public static AptekaException bucketProductNotFound() {
+        return new AptekaException(BUCKET_PRODUCT_NOT_FOUND);
+    }
+
     public static AptekaException langNotValid() {
         return new AptekaException(LANG_NOT_VALID);
     }
@@ -65,4 +69,7 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(USER_DELETE_EXCEPTION);
     }
 
+    public static AptekaException bucketNotFound() {
+        return new AptekaException(BUCKET_NOT_FOUND);
+    }
 }
