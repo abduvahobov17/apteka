@@ -172,7 +172,6 @@ public class BotServiceImpl implements BotService {
         sendMessage.setChatId(chatId);
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         List<KeyboardRow> rows = new ArrayList<>();
 
@@ -234,7 +233,6 @@ public class BotServiceImpl implements BotService {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setSelective(true);
         getAllProductList(replyKeyboardMarkup, user.getLang(), allProducts);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
         sendMessage.setText(isRu ? CHOOSE_PRODUCT_RU : CHOOSE_PRODUCT_UZ);
         user.setBotState(SEARCH_PRODUCT_PROGRESS);
@@ -260,7 +258,6 @@ public class BotServiceImpl implements BotService {
             sendMessage.setText(isRu ? THANKS_FOR_USING_BOT_RU : THANKS_FOR_USING_BOT_UZ);
             ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
             replyKeyboardMarkup.setSelective(true);
-            replyKeyboardMarkup.setOneTimeKeyboard(true);
             replyKeyboardMarkup.setResizeKeyboard(true);
             List<KeyboardRow> rows = new ArrayList<>();
 
@@ -427,7 +424,6 @@ public class BotServiceImpl implements BotService {
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         List<KeyboardRow> rows = new ArrayList<>();
 

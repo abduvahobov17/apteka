@@ -8,7 +8,7 @@ public interface ApiConstants {
 
     String USERS = "/users";
 
-    String BUCKET = "/bucket";
+    String BUCKETS = "/buckets";
 
     String UNIT_TYPES = "/unit-types";
 
