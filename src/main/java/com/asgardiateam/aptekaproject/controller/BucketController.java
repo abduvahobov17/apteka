@@ -18,7 +18,7 @@ import static com.asgardiateam.aptekaproject.constants.ApiConstants.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = API_V1 + BUCKET, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(value = API_V1 + BUCKETS, produces = APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class BucketController {
 
