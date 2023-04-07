@@ -76,4 +76,8 @@ public class AptekaException extends RuntimeException {
     public static AptekaException saveError() {
         return new AptekaException(SAVE_ERROR);
     }
+
+    public static AptekaException excelError() {
+        return new AptekaException(EXCEL_ERROR);
+    }
 }

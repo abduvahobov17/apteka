@@ -10,10 +10,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 
 import static com.asgardiateam.aptekaproject.common.ResponseData.ok;
@@ -54,6 +61,16 @@ public class ProductController {
     public Object delete(@PathVariable Long productId) {
         productService.deleteById(productId);
         return ok(new MessageDTO(SUCCESS_MESSAGE));
+    }
+
+    @GetMapping(EXCEL)
+    public Object excel(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC, size = 20) Pageable pageable,
+                        ProductCriteria criteria) {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Content-type", "application/vnd.ms-excel");
+//        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
+//        byte[] bytes = productService.generateExcelProduct(criteria, pageable);
+        return ok(Base64.getEncoder().encode(productService.generateExcelProduct(criteria, pageable)));
     }
 
     @GetMapping(UNIT_TYPES)

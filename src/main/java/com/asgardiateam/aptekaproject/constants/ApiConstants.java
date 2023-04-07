@@ -12,6 +12,8 @@ public interface ApiConstants {
 
     String UNIT_TYPES = "/unit-types";
 
+    String EXCEL = "/excel";
+
     String BUCKET_STATUSES = "/bucket-statuses";
 
     String STATUSES = "/statuses";

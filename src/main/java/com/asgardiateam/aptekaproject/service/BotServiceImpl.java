@@ -507,6 +507,7 @@ public class BotServiceImpl implements BotService {
         Bucket bucket = bucketService.getBucketByUserId(user.getId()).get();
 
         if (action.equals(CONFIRM_UZ) || action.equals(CONFIRM_RU)) {
+            bucket.setOverallAmount(bucket.getBucketProducts().stream().mapToLong(y -> (y.getAmount() * y.getProduct().getPrice())).sum());
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
             sendMessage.setText(isRu ? DELIVERY_CONFIRM_RU : DELIVERY_CONFIRM_UZ);
             bucket.setBucketStatus(BucketStatus.PENDING);

@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @SuperBuilder
 @Entity
 @Table(name = "bucket")
@@ -31,6 +30,9 @@ public class Bucket extends AuditingEntity {
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
+    @Column(name = "overall_amount")
+    private Long overallAmount;
+
     @Column(name = "lon")
     private Double lon;
 
@@ -47,5 +49,9 @@ public class Bucket extends AuditingEntity {
     public void addBucketProducts(List<BucketProduct> bucketProducts) {
         this.bucketProducts.addAll(bucketProducts);
         bucketProducts.forEach(value -> value.setBucket(this));
+    }
+
+    public Bucket() {
+        this.overallAmount = 0L;
     }
 }

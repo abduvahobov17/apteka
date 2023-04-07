@@ -107,6 +107,7 @@ public interface MessageKey {
     String BUCKET_NOT_FOUND = "bucket.not.found";
     String SUCCESS_MESSAGE = "success.message";
     String SAVE_ERROR = "save.error";
+    String EXCEL_ERROR = "excel.error";
     String FIRST_NAME_NOT_VALID = "first.name.not.valid";
     String LAST_NAME_NOT_VALID = "last.name.not.valid";
     String LOGIN_NOT_VALID = "login.not.valid";

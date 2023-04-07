@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.util.Base64;
 import java.util.List;
 
 import static com.asgardiateam.aptekaproject.common.ResponseData.ok;
@@ -55,6 +56,12 @@ public class UserController {
     public Object delete(@PathVariable Long userId) {
         userService.deleteById(userId);
         return ok(new MessageDTO(SUCCESS_MESSAGE));
+    }
+
+    @GetMapping(EXCEL)
+    public Object excel(UserCriteria criteria,
+                        @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC, size = 20) Pageable pageable) {
+        return ok(Base64.getEncoder().encode(userService.generateExcel(pageable, criteria)));
     }
 
     @GetMapping(CLIENT_TYPES)
