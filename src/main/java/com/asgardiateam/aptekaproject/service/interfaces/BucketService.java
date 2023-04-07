@@ -15,4 +15,6 @@ public interface BucketService {
     Optional<Bucket> getBucketByUserId(Long userId);
 
     Bucket save(Bucket bucket);
+
+    byte[] generateExcel(BucketCriteria criteria, Pageable pageable);
 }

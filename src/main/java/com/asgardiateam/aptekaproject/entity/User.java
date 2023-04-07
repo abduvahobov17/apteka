@@ -5,10 +5,7 @@ import com.asgardiateam.aptekaproject.enums.BotState;
 import com.asgardiateam.aptekaproject.enums.ClientType;
 import com.asgardiateam.aptekaproject.enums.Lang;
 import com.asgardiateam.aptekaproject.enums.UserType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -47,19 +44,13 @@ public class User extends AuditingEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "lon")
-    private Long lon;
-
-    @Column(name = "lat")
-    private Long lat;
+    @Column(name = "order_amount")
+    @Builder.Default
+    private Long orderAmount = 0L;
 
     @Column(name = "client_type")
     @Enumerated(EnumType.STRING)
     private ClientType clientType;
-
-//    @Column(name = "user_type")
-//    @Enumerated(EnumType.STRING)
-//    private UserType userType;
 
     @Column(name = "language")
     @Enumerated(EnumType.STRING)
@@ -72,6 +63,7 @@ public class User extends AuditingEntity {
     public User(String telegramId) {
         this.telegramId = telegramId;
         this.botState = BotState.START;
+        this.orderAmount = 0L;
     }
 
 }
