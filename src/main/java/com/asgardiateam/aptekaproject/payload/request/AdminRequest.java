@@ -20,7 +20,7 @@ public class AdminRequest {
     private String lastName;
 
     @NotNull(message = PHONE_NUMBER_NOT_VALID)
-    private String phoneNumber;
+    private String phone;
 
     @NotNull(message = LOGIN_NOT_VALID)
     private String login;
