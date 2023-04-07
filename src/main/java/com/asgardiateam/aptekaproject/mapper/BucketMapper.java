@@ -22,6 +22,7 @@ public interface BucketMapper {
     @Mapping(target = "latitude", source = "lat")
     @Mapping(target = "clientInfo", source = "bucket", qualifiedByName = "userToClientInfo")
     @Mapping(target = "bucketId", source = "id")
+    @Mapping(target = "paymentType", expression = "java(bucket.getPaymentType().getUzbName())")
     BucketDTO toDTO(Bucket bucket);
 
     @Named("userToClientInfo")
@@ -48,7 +49,7 @@ public interface BucketMapper {
                     .price(bucketProduct.getProduct().getPrice())
                     .build());
             bucketProductDTO.setAmount(bucketProduct.getAmount());
-            bucketProductDTO.setId(bucketProductDTO.getId());
+            bucketProductDTO.setId(bucketProduct.getId());
             bucketProductDTOS.add(bucketProductDTO);
         }
         return bucketProductDTOS;

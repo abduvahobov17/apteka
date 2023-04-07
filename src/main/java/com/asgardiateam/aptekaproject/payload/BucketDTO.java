@@ -14,13 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 public class BucketDTO {
 
-    private String bucketId;
+    private Long bucketId;
 
     private BucketStatus bucketStatus;
 
     private Double longitude;
 
     private Double latitude;
+
+    private String paymentType;
 
     private ClientInfo clientInfo;
 
