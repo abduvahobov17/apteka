@@ -1,5 +1,6 @@
 package com.asgardiateam.aptekaproject.common.deserializer;
 
+import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.enums.Status;
 import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.fasterxml.jackson.core.JacksonException;
@@ -11,12 +12,12 @@ import java.io.IOException;
 
 import static java.util.Optional.ofNullable;
 
-public class StatusDeserializer extends JsonDeserializer<Status> {
+public class StateDeserializer extends JsonDeserializer<State> {
 
     @Override
-    public Status deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public State deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
         return ofNullable(jsonParser.getText())
-                .map(Status::tryFindStatus)
+                .map(State::tryFindStatus)
                 .orElseThrow(AptekaException::statusNotValid);
     }
 }

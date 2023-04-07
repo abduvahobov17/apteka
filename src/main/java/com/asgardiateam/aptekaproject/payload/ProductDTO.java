@@ -1,5 +1,6 @@
 package com.asgardiateam.aptekaproject.payload;
 
+import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.enums.Status;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ public class ProductDTO {
 
     private String supplier;
 
-    private Status status;
+    private String state;
 
     private String description;
 

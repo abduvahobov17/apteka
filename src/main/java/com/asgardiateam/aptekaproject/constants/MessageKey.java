@@ -27,6 +27,12 @@ public interface MessageKey {
     String PLUS = "➕";
     String TO_BUCKET_RU = "В карзину";
     String TO_BUCKET_UZ = "Savatga";
+    String CASH_RU = "Наличные\uD83D\uDCB5";
+    String CASH_UZ = "Naqd\uD83D\uDCB5";
+    String CARD_RU = "Карта\uD83D\uDCB3";
+    String CARD_UZ = "Karta\uD83D\uDCB3";
+    String BACK_RU = "Назад⬅️";
+    String BACK_UZ = "Orqaga⬅️";
     String IN_BUCKET_RU = "В карзине✅";
     String IN_BUCKET_UZ = "Savatda✅";
     String CANCELLED_RU = "Отменено❌";
@@ -43,6 +49,8 @@ public interface MessageKey {
     String DELIVERY_RU = "\uD83D\uDE96 Доставка";
     String DELIVERY_UZ = "\uD83D\uDE96 Yetkazib berish";
     String CHOOSE_DELIVERY_TYPE_RU = "Выберите тип доставки";
+    String CHOOSE_PAYMENT_TYPE_RU = "Выберите способ оплаты";
+    String CHOOSE_PAYMENT_TYPE_UZ = "To'lov uslubini tanlang";
     String CHOOSE_DELIVERY_TYPE_UZ = "Yetkazib berish uslubini tanlang";
     String LIST_OF_CHOSEN_PRODUCTS_RU = "Список выбранных продуктов:";
     String LIST_OF_CHOSEN_PRODUCTS_UZ = "Tanlang mahsulotlar ro'yxati";
@@ -98,5 +106,9 @@ public interface MessageKey {
     String USER_DELETE_EXCEPTION = "user.delete.exception";
     String BUCKET_NOT_FOUND = "bucket.not.found";
     String SUCCESS_MESSAGE = "success.message";
+    String SAVE_ERROR = "save.error";
+    String FIRST_NAME_NOT_VALID = "first.name.not.valid";
+    String LAST_NAME_NOT_VALID = "last.name.not.valid";
+    String LOGIN_NOT_VALID = "login.not.valid";
 
 }

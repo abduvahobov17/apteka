@@ -12,6 +12,7 @@ public interface UserMapper {
 
 
     @Mapping(target = "registeredDate", expression = "java(user.getCreatedDate().toEpochMilli())")
+    @Mapping(target = "clientType", expression = "java(user.getClientType().getUzbName())")
     UserDTO toDTO(User user);
 
     @Mapping(target = "id", ignore = true)

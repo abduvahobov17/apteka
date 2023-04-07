@@ -50,7 +50,7 @@ public class Product extends AuditingEntity {
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
     @Builder.Default
-        private State state = State.ALIVE;
+    private State state = State.ALIVE;
 
     public Product() {
         this.state = State.ALIVE;

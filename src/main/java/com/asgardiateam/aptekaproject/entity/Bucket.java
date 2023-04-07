@@ -2,6 +2,7 @@ package com.asgardiateam.aptekaproject.entity;
 
 import com.asgardiateam.aptekaproject.audit.AuditingEntity;
 import com.asgardiateam.aptekaproject.enums.BucketStatus;
+import com.asgardiateam.aptekaproject.enums.PaymentType;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -25,6 +26,10 @@ public class Bucket extends AuditingEntity {
     @Column(name = "bucket_status")
     @Enumerated(EnumType.STRING)
     private BucketStatus bucketStatus;
+
+    @Column(name = "payment_type")
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 
     @Column(name = "lon")
     private Double lon;

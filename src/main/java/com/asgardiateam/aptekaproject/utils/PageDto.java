@@ -26,4 +26,8 @@ public class PageDto<T> {
 
     private List<T> items;
 
+    public PageDto(List<T> items){
+        this.items = items;
+    }
+
 }
