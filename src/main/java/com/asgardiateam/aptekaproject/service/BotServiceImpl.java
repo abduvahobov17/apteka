@@ -60,6 +60,7 @@ public class BotServiceImpl implements BotService {
         sendMessageMethods.put(SEARCH_PRODUCT_START, this::searchStart);
         sendMessageMethods.put(SEARCH_PRODUCT_PROGRESS, this::searchProgress);
         sendMessageMethods.put(VIEW_PRODUCT, this::viewProductStage);
+        sendMessageMethods.put(PAYMENT_START, this::paymentStart);
         sendMessageMethods.put(DELIVERY_START, this::deliveryStart);
         sendMessageMethods.put(DELIVERY_PROGRESS, this::deliveryProgress);
         sendMessageMethods.put(DELIVERY_PROGRESS_LOCATION, this::deliveryLocation);
@@ -72,7 +73,7 @@ public class BotServiceImpl implements BotService {
 
     @Override
     public BotApiMethod<? extends Serializable> executeMethod(Update update, User user) {
-        if(update.hasCallbackQuery())
+        if (update.hasCallbackQuery())
             return editReplyMarkup.get(user.getBotState()).apply(update.getCallbackQuery(), user);
         else
             return sendMessageMethods.get(user.getBotState()).apply(update, user);
@@ -356,8 +357,8 @@ public class BotServiceImpl implements BotService {
                 ? (TO_BUCKET_RU)
                 : (TO_BUCKET_UZ));
         toBucket.setCallbackData(isRu
-                ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
-                : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+                ? (TO_BUCKET_RU + "/" + bucketProduct.getId())
+                : (TO_BUCKET_UZ + "/" + bucketProduct.getId()));
         inlineKeyboardButtonsBucket.add(toBucket);
         listListButton.add(inlineKeyboardButtonsBucket);
 
@@ -372,32 +373,95 @@ public class BotServiceImpl implements BotService {
         return null;
     }
 
+    public SendMessage paymentStart(Update update, User user) {
+        String chatId = getChatId(update);
+        boolean isRu = user.getLang().equals(RU);
+        String action = update.getMessage().getText();
+        SendMessage sendMessage = new SendMessage();
+
+        Bucket bucket = bucketService.getBucketByUserId(user.getId()).get();
+
+        if (action.equals(CASH_UZ) || action.equals(CASH_RU)) {
+            user.setBotState(DELIVERY_START);
+            userService.save(user);
+            sendMessage = orderMenu(user.getLang());
+            sendMessage.setChatId(chatId);
+            bucket.setPaymentType(PaymentType.CASH);
+            bucketService.save(bucket);
+            return sendMessage;
+        } else if (action.equals(CARD_UZ) || action.equals(CARD_RU)) {
+            user.setBotState(DELIVERY_START);
+            userService.save(user);
+            sendMessage = orderMenu(user.getLang());
+            sendMessage.setChatId(chatId);
+            bucket.setPaymentType(PaymentType.CARD);
+            bucketService.save(bucket);
+            return sendMessage;
+        } else if (action.equals(BACK_UZ) || action.equals(BACK_RU)) {
+            ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+            replyKeyboardMarkup.setResizeKeyboard(true);
+            replyKeyboardMarkup.setSelective(true);
+            getAllProductList(replyKeyboardMarkup, user.getLang(), new PageDto<>(Collections.emptyList()));
+            sendMessage.setReplyMarkup(replyKeyboardMarkup);
+            sendMessage.setText(isRu ? CHOOSE_PRODUCT_RU : CHOOSE_PRODUCT_UZ);
+            sendMessage.setChatId(chatId);
+            user.setBotState(SEARCH_PRODUCT_PROGRESS);
+            userService.save(user);
+            return sendMessage;
+        }
+
+        sendMessage.setText("Choose the buttons below");
+        return sendMessage;
+    }
+
     public SendMessage deliveryStart(Update update, User user) {
         String chatId = getChatId(update);
         boolean isRu = user.getLang().equals(RU);
         String action = update.getMessage().getText();
+        SendMessage sendMessage = new SendMessage();
 
         Bucket bucket = bucketService.getBucketByUserId(user.getId()).get();
 
         if (action.equals(PICKUP_UZ) || action.equals(PICKUP_RU)) {
             user.setBotState(DELIVERY_PROGRESS);
             userService.save(user);
-            return pickUpMenu(bucket.getBucketProducts(), isRu, chatId);
-        }
-
-        if (action.equals(DELIVERY_UZ) || action.equals(DELIVERY_RU)) {
+            return confirmMenu(bucket.getBucketProducts(), isRu, chatId);
+        } else if (action.equals(DELIVERY_UZ) || action.equals(DELIVERY_RU)) {
             user.setBotState(DELIVERY_PROGRESS_LOCATION);
             userService.save(user);
             return getLocation(isRu, chatId);
+        } else if (action.equals(BACK_UZ) || action.equals(BACK_RU)) {
+            sendMessage = paymentMenu(user.getLang());
+            sendMessage.setChatId(chatId);
+            user.setBotState(PAYMENT_START);
+            userService.save(user);
+            return sendMessage;
         }
-        return null;
+
+        sendMessage.setText("Choose the buttons below");
+        return sendMessage;
     }
 
     public SendMessage deliveryLocation(Update update, User user) {
         String chatId = getChatId(update);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
+
+        if (update.getMessage().hasText()) {
+
+            String action = update.getMessage().getText();
+
+            if (action.equals(BACK_UZ) || action.equals(BACK_RU)) {
+                user.setBotState(DELIVERY_START);
+                userService.save(user);
+                sendMessage = orderMenu(user.getLang());
+                sendMessage.setChatId(chatId);
+                return sendMessage;
+            }
+        }
+
         Location location = update.getMessage().getLocation();
+
         if (location == null) {
             sendMessage.setText("SEND LOCATION");
             return sendMessage;
@@ -411,7 +475,7 @@ public class BotServiceImpl implements BotService {
         user.setBotState(DELIVERY_PROGRESS);
         userService.save(user);
 
-        return pickUpMenu(bucket.getBucketProducts(), user.getLang().equals(RU), chatId);
+        return confirmMenu(bucket.getBucketProducts(), user.getLang().equals(RU), chatId);
     }
 
     public SendMessage deliveryProgress(Update update, User user) {
@@ -450,15 +514,11 @@ public class BotServiceImpl implements BotService {
             userService.save(user);
             bucketService.save(bucket);
             return sendMessage;
-        }
-
-        if (action.equals(CANCEL_UZ) || action.equals(CANCEL_RU)) {
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-            sendMessage.setText(isRu ? THANKS_FOR_USING_BOT_RU : THANKS_FOR_USING_BOT_UZ);
-            bucket.setBucketStatus(BucketStatus.CANCEL);
-            user.setBotState(MAIN_MENU);
+        } else if (action.equals(BACK_UZ) || action.equals(BACK_RU)) {
+            user.setBotState(DELIVERY_START);
             userService.save(user);
-            bucketService.save(bucket);
+            sendMessage = orderMenu(user.getLang());
+            sendMessage.setChatId(chatId);
             return sendMessage;
         }
 
@@ -488,8 +548,8 @@ public class BotServiceImpl implements BotService {
                     ? (IN_BUCKET_RU)
                     : (IN_BUCKET_UZ));
             toBucket.setCallbackData(data.contains(TO_BUCKET_RU)
-                    ? (IN_BUCKET_RU+"/"+bucketProduct.getId())
-                    : (IN_BUCKET_UZ+"/"+bucketProduct.getId()));
+                    ? (IN_BUCKET_RU + "/" + bucketProduct.getId())
+                    : (IN_BUCKET_UZ + "/" + bucketProduct.getId()));
             bucketButton.add(toBucket);
         } else if (data.contains(IN_BUCKET_RU) || data.contains(IN_BUCKET_UZ)) {
             bucketProduct.setStatus(BucketProductStatus.REVIEWED);
@@ -499,8 +559,8 @@ public class BotServiceImpl implements BotService {
                     ? (TO_BUCKET_RU)
                     : (TO_BUCKET_UZ));
             toBucket.setCallbackData(data.contains(IN_BUCKET_RU)
-                    ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
-                    : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+                    ? (TO_BUCKET_RU + "/" + bucketProduct.getId())
+                    : (TO_BUCKET_UZ + "/" + bucketProduct.getId()));
             bucketButton.add(toBucket);
         } else {
             bucketButton = new ArrayList<>();
@@ -509,8 +569,8 @@ public class BotServiceImpl implements BotService {
                     ? (TO_BUCKET_RU)
                     : (TO_BUCKET_UZ));
             toBucket.setCallbackData(user.getLang().equals(RU)
-                    ? (TO_BUCKET_RU+"/"+bucketProduct.getId())
-                    : (TO_BUCKET_UZ+"/"+bucketProduct.getId()));
+                    ? (TO_BUCKET_RU + "/" + bucketProduct.getId())
+                    : (TO_BUCKET_UZ + "/" + bucketProduct.getId()));
             bucketButton.add(toBucket);
         }
 
@@ -587,8 +647,8 @@ public class BotServiceImpl implements BotService {
         }
 
         if (data.contains(ORDER)) {
-            SendMessage sendMessage = orderMenu(user.getLang());
-            user.setBotState(DELIVERY_START);
+            SendMessage sendMessage = paymentMenu(user.getLang());
+            user.setBotState(PAYMENT_START);
             sendMessage.setChatId(String.valueOf(callbackQuery.getMessage().getChatId()));
             userService.save(user);
             return sendMessage;
@@ -637,7 +697,8 @@ public class BotServiceImpl implements BotService {
         return String.valueOf(update.getMessage().getChatId());
     }
 
-    private void getAllProductList(ReplyKeyboardMarkup replyKeyboardMarkup, Lang lang, PageDto<ProductDTO> allProducts) {
+    private void getAllProductList(ReplyKeyboardMarkup replyKeyboardMarkup, Lang
+            lang, PageDto<ProductDTO> allProducts) {
 
         boolean isRu = lang.equals(RU);
 
@@ -653,9 +714,6 @@ public class BotServiceImpl implements BotService {
         firstRow.add(search);
         rows.add(firstRow);
 
-        KeyboardButton order = new KeyboardButton();
-        order.setText(isRu ? ORDER_RU : ORDER_UZ);
-        secondRow.add(order);
         KeyboardButton cancel = new KeyboardButton();
         cancel.setText(isRu ? CANCEL_RU : CANCEL_UZ);
         secondRow.add(cancel);
@@ -679,7 +737,8 @@ public class BotServiceImpl implements BotService {
                 PRODUCT_DESCRIPTION_UZ + ": " + product.getDescription();
     }
 
-    private String getBucketMenu(InlineKeyboardMarkup inlineKeyboardMarkup, Lang lang, Long bucketId, List<BucketProduct> bucketProducts) {
+    private String getBucketMenu(InlineKeyboardMarkup inlineKeyboardMarkup, Lang lang, Long
+            bucketId, List<BucketProduct> bucketProducts) {
 
         boolean isRu = lang.equals(RU);
 
@@ -736,6 +795,37 @@ public class BotServiceImpl implements BotService {
         return listOfProduct.toString().trim();
     }
 
+    private SendMessage paymentMenu(Lang lang) {
+        boolean isRu = lang.equals(RU);
+
+        SendMessage sendMessage = new SendMessage();
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setSelective(true);
+        List<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow firstRow = new KeyboardRow();
+
+        KeyboardButton cash = new KeyboardButton();
+        cash.setText(isRu ? CASH_RU : CASH_UZ);
+        firstRow.add(cash);
+        KeyboardButton card = new KeyboardButton();
+        card.setText(isRu ? CARD_RU : CARD_UZ);
+        firstRow.add(card);
+
+        KeyboardRow secondRow = new KeyboardRow();
+        KeyboardButton back = new KeyboardButton();
+        back.setText(isRu ? BACK_RU : BACK_UZ);
+        secondRow.add(back);
+
+        rows.add(firstRow);
+        rows.add(secondRow);
+        replyKeyboardMarkup.setKeyboard(rows);
+        sendMessage.setText(isRu ? CHOOSE_PAYMENT_TYPE_RU : CHOOSE_PAYMENT_TYPE_UZ);
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        return sendMessage;
+    }
+
     private SendMessage orderMenu(Lang lang) {
 
         boolean isRu = lang.equals(RU);
@@ -754,7 +844,13 @@ public class BotServiceImpl implements BotService {
         delivery.setText(isRu ? DELIVERY_RU : DELIVERY_UZ);
         firstRow.add(delivery);
 
+        KeyboardRow secondRow = new KeyboardRow();
+        KeyboardButton back = new KeyboardButton();
+        back.setText(isRu ? BACK_RU : BACK_UZ);
+        secondRow.add(back);
+
         rows.add(firstRow);
+        rows.add(secondRow);
         replyKeyboardMarkup.setKeyboard(rows);
         sendMessage.setText(isRu ? CHOOSE_DELIVERY_TYPE_RU : CHOOSE_DELIVERY_TYPE_UZ);
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
@@ -762,21 +858,23 @@ public class BotServiceImpl implements BotService {
         return sendMessage;
     }
 
-    private SendMessage pickUpMenu(List<BucketProduct> bucketProducts, boolean isRu, String chatId) {
+    private SendMessage confirmMenu(List<BucketProduct> bucketProducts, boolean isRu, String chatId) {
 
         SendMessage sendMessage = new SendMessage();
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         List<KeyboardRow> rows = new ArrayList<>();
-        KeyboardRow row = new KeyboardRow();
+        KeyboardRow firstRow = new KeyboardRow();
+        KeyboardRow secondRow = new KeyboardRow();
         KeyboardButton button = new KeyboardButton();
         button.setText(isRu ? CONFIRM_RU : CONFIRM_UZ);
         KeyboardButton cancel = new KeyboardButton();
-        cancel.setText(isRu ? CANCEL_RU : CANCEL_UZ);
-        row.add(button);
-        row.add(cancel);
-        rows.add(row);
+        cancel.setText(isRu ? BACK_RU : BACK_UZ);
+        firstRow.add(button);
+        secondRow.add(cancel);
+        rows.add(firstRow);
+        rows.add(secondRow);
         replyKeyboardMarkup.setKeyboard(rows);
 
         bucketProducts = bucketProducts.stream().filter(x -> x.getStatus().equals(BucketProductStatus.CHOSEN)).toList();
@@ -809,10 +907,9 @@ public class BotServiceImpl implements BotService {
 
         List<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
-        KeyboardButton location = new KeyboardButton();
-        location.setRequestLocation(true);
-        location.setText(isRu ? LOCATION_RU : LOCATION_UZ);
-        row.add(location);
+        KeyboardButton back = new KeyboardButton();
+        back.setText(isRu ? BACK_RU : BACK_UZ);
+        row.add(back);
         rows.add(row);
 
         replyKeyboardMarkup.setKeyboard(rows);

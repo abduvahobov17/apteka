@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface ProductRepository extends JpaRepositoryImplementation<Product, Long> {
     Optional<Product> findByIdAndState(Long id, State alive);
 
-    Optional<Product> findByNameAndState(String name, State state);
+    Optional<Product> findFirstByNameAndState(String name, State state);
 }

@@ -36,7 +36,7 @@ public class UserDTO {
 
     private String phoneNumber;
 
-    private ClientType clientType;
+    private String clientType;
 
     private Lang lang;
 

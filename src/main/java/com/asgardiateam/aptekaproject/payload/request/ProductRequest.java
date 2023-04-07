@@ -1,8 +1,8 @@
 package com.asgardiateam.aptekaproject.payload.request;
 
-import com.asgardiateam.aptekaproject.common.deserializer.StatusDeserializer;
+import com.asgardiateam.aptekaproject.common.deserializer.StateDeserializer;
 import com.asgardiateam.aptekaproject.common.deserializer.UnitTypeDeserializer;
-import com.asgardiateam.aptekaproject.enums.Status;
+import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
@@ -38,8 +38,8 @@ public class ProductRequest {
     @NotEmpty(message = PHONE_NUMBER_NOT_VALID)
     private String phoneNumber;
 
-    @JsonDeserialize(using = StatusDeserializer.class)
-    private Status status;
+    @JsonDeserialize(using = StateDeserializer.class)
+    private State state;
 
     @PositiveOrZero(message = PRICE_NOT_VALID)
     private Long price;

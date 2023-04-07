@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<Product> findByName(String name) {
-        return productRepository.findByNameAndState(name, State.ALIVE);
+        return productRepository.findFirstByNameAndState(name, State.ALIVE);
     }
 
     @Override

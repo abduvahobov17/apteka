@@ -72,4 +72,8 @@ public class AptekaException extends RuntimeException {
     public static AptekaException bucketNotFound() {
         return new AptekaException(BUCKET_NOT_FOUND);
     }
+
+    public static AptekaException saveError() {
+        return new AptekaException(SAVE_ERROR);
+    }
 }
