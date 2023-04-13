@@ -66,11 +66,11 @@ public class ProductController {
     @GetMapping(EXCEL)
     public Object excel(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC, size = 20) Pageable pageable,
                         ProductCriteria criteria) {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-type", "application/vnd.ms-excel");
-//        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
-//        byte[] bytes = productService.generateExcelProduct(criteria, pageable);
-        return ok(Base64.getEncoder().encode(productService.generateExcelProduct(criteria, pageable)));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-type", "application/vnd.ms-excel");
+        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
+        byte[] bytes = productService.generateExcelProduct(criteria, pageable);
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
     @GetMapping(UNIT_TYPES)

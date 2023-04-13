@@ -203,8 +203,10 @@ public class BotServiceImpl implements BotService {
             user.setBotState(SEARCH_PRODUCT_START);
             sendMessage.setText(isRu ? SEARCH_PRODUCT_START_RU : SEARCH_PRODUCT_START_UZ);
         } else if (text.equals(SETTINGS_RU) || text.equals(SETTINGS_UZ)) {
-            user.setBotState(SETTINGS);
-            sendMessage.setText(isRu ? SETTINGS_START_RU : SETTINGS_START_UZ);
+//            user.setBotState(SETTINGS);
+//            sendMessage.setText(isRu ? SETTINGS_START_RU : SETTINGS_START_UZ);
+            sendMessage.setText("Service not available");
+            return sendMessage;
         } else {
             sendMessage.setText(isRu ? CHOOSE_ERROR_RU : CHOOSE_ERROR_UZ);
         }
