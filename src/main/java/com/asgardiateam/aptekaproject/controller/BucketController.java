@@ -37,12 +37,11 @@ public class BucketController {
     @GetMapping(EXCEL)
     public ResponseEntity<?> excel(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
                                 BucketCriteria criteria) {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Content-type", "application/vnd.ms-excel");
-//        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
-//        byte[] bytes = bucketService.generateExcel(criteria, pageable);
-//        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
-        return ok(Base64.getEncoder().encode(bucketService.generateExcel(criteria, pageable)));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-type", "application/vnd.ms-excel");
+        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
+        byte[] bytes = bucketService.generateExcel(criteria, pageable);
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
     @GetMapping(BUCKET_STATUSES)

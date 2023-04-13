@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -61,7 +64,11 @@ public class UserController {
     @GetMapping(EXCEL)
     public Object excel(UserCriteria criteria,
                         @PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC, size = 20) Pageable pageable) {
-        return ok(Base64.getEncoder().encode(userService.generateExcel(pageable, criteria)));
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-type", "application/vnd.ms-excel");
+        headers.set("Content-Disposition", "attachment; filename=\"product_excel.xlsx\"");
+        byte[] bytes = userService.generateExcel(pageable, criteria);
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
     @GetMapping(CLIENT_TYPES)
