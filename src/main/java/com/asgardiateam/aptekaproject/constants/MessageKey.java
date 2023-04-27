@@ -90,6 +90,7 @@ public interface MessageKey {
     String PRODUCT_DELETE_ERROR = "product.delete.error";
     String USER_NOT_FOUND_BY_TELEGRAM_ID = "user.not.found.by.telegram.id";
     String UNAUTHORIZED = "unauthorized";
+    String ORDER_CANNOT_BE_CONFIRMED = "order.cannot.be.confirmed";
     String USER_NOT_FOUND_BY_ID = "user.not.found.by.id";
     String NAME_NOT_VALID = "name.not.valid";
     String AMOUNT_NOT_VALID = "amount.not.valid";
@@ -101,6 +102,12 @@ public interface MessageKey {
     String UNIT_TYPE_NOT_VALID = "unit.type.not.valid";
     String CLIENT_TYPE_NOT_VALID = "client.type.not.valid";
     String BOT_STATE_NOT_VALID = "bot.state.not.valid";
+    String BUCKET_STATUS_NOT_VALID = "bucket.status.not.valid";
+    String NEW_AND_REPEATED_PASSWORDS_DOES_NOT_MATCH = "new.and.repeated.passwords.does.not.match";
+    String OLD_PASSWORD_NOT_VALID = "old.password.not.valid";
+    String OLD_PASSWORD_NOT_CORRECT = "old.password.not.correct";
+    String NEW_PASSWORD_NOT_VALID = "new.password.not.valid";
+    String REPEATED_PASSWORD_NOT_VALID = "repeated.password.not.valid";
     String BUCKET_PRODUCT_NOT_FOUND = "bucket.product.not.found";
     String LANG_NOT_VALID = "lang.not.valid";
     String USER_DELETE_EXCEPTION = "user.delete.exception";

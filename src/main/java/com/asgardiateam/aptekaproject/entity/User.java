@@ -66,4 +66,8 @@ public class User extends AuditingEntity {
         this.orderAmount = 0L;
     }
 
+    public void addAmountToOrderAmount(Long amount) {
+        orderAmount = orderAmount + amount;
+    }
+
 }

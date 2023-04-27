@@ -75,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public byte[] generateExcelProduct(ProductCriteria criteria, Pageable pageable) {
-        List<Product> content = findAll(pageable, criteria).getContent();
+        List<Product> content = findAll(Pageable.unpaged(), criteria).getContent();
 
         try {
 

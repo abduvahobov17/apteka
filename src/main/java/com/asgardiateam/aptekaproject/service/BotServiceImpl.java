@@ -425,11 +425,15 @@ public class BotServiceImpl implements BotService {
         Bucket bucket = bucketService.getBucketByUserId(user.getId()).get();
 
         if (action.equals(PICKUP_UZ) || action.equals(PICKUP_RU)) {
+            bucket.setDeliveryType(DeliveryType.PICK_UP);
             user.setBotState(DELIVERY_PROGRESS);
+            bucketService.save(bucket);
             userService.save(user);
             return confirmMenu(bucket.getBucketProducts(), isRu, chatId);
         } else if (action.equals(DELIVERY_UZ) || action.equals(DELIVERY_RU)) {
             user.setBotState(DELIVERY_PROGRESS_LOCATION);
+            bucket.setDeliveryType(DeliveryType.ORDER);
+            bucketService.save(bucket);
             userService.save(user);
             return getLocation(isRu, chatId);
         } else if (action.equals(BACK_UZ) || action.equals(BACK_RU)) {
@@ -512,7 +516,7 @@ public class BotServiceImpl implements BotService {
             bucket.setOverallAmount(bucket.getBucketProducts().stream().mapToLong(y -> (y.getAmount() * y.getProduct().getPrice())).sum());
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
             sendMessage.setText(isRu ? DELIVERY_CONFIRM_RU : DELIVERY_CONFIRM_UZ);
-            bucket.setBucketStatus(BucketStatus.PENDING);
+            bucket.setBucketStatus(BucketStatus.CONFIRMED);
             user.setBotState(MAIN_MENU);
             userService.save(user);
             bucketService.save(bucket);

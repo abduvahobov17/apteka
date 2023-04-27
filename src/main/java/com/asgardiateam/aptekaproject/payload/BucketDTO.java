@@ -1,6 +1,7 @@
 package com.asgardiateam.aptekaproject.payload;
 
 import com.asgardiateam.aptekaproject.enums.BucketStatus;
+import com.asgardiateam.aptekaproject.enums.DeliveryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,8 @@ public class BucketDTO {
 
     private Long bucketId;
 
+    private Long overallAmount;
+
     private BucketStatus bucketStatus;
 
     private Double longitude;
@@ -23,6 +26,8 @@ public class BucketDTO {
     private Double latitude;
 
     private String paymentType;
+
+    private DeliveryType deliveryType;
 
     private ClientInfo clientInfo;
 

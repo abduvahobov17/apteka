@@ -60,6 +60,9 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
+                .logout()
+                .logoutUrl("/api/v1/log-out")
+                .and()
                 .build();
     }
 

@@ -5,14 +5,21 @@ import com.asgardiateam.aptekaproject.entity.Admin;
 import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.asgardiateam.aptekaproject.mapper.AdminMapper;
 import com.asgardiateam.aptekaproject.payload.AdminDTO;
+import com.asgardiateam.aptekaproject.payload.ChangePasswordRequest;
 import com.asgardiateam.aptekaproject.payload.request.AdminRequest;
 import com.asgardiateam.aptekaproject.repository.AdminRepository;
 import com.asgardiateam.aptekaproject.service.interfaces.AdminService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
@@ -42,7 +49,7 @@ public class AdminServiceImpl implements AdminService {
         return adminMapper.toDTO(save(admin));
     }
 
-    private Admin save(Admin admin) {
+    public Admin save(Admin admin) {
         try {
             return adminRepository.save(admin);
         } catch (Exception e) {
