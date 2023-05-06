@@ -13,6 +13,6 @@ public interface AdminMapper {
 
     Admin toUpdate(AdminRequest request, @MappingTarget Admin admin);
 
-    @Mapping(target = "photoUrl", expression = "java(photoUrl4)")
+    @Mapping(target = "photoUrl", expression = "java(photoUrl)")
     AdminDTO toDTO(Admin admin, @Context String photoUrl);
 }
