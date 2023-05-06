@@ -106,6 +106,7 @@ public interface MessageKey {
     String NEW_AND_REPEATED_PASSWORDS_DOES_NOT_MATCH = "new.and.repeated.passwords.does.not.match";
     String OLD_PASSWORD_NOT_VALID = "old.password.not.valid";
     String OLD_PASSWORD_NOT_CORRECT = "old.password.not.correct";
+    String PASSWORD_OR_LOGIN_NOT_CORRECT = "password.or.login.not.correct";
     String PHOTO_NOT_VALID = "photo.not.valid";
     String TITLE_NOT_VALID = "title.not.valid";
     String NEW_PASSWORD_NOT_VALID = "new.password.not.valid";

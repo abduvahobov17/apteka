@@ -29,6 +29,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(OLD_PASSWORD_NOT_CORRECT);
     }
 
+    public static AptekaException passwordOrLoginNotCorrect() {
+        return new AptekaException(PASSWORD_OR_LOGIN_NOT_CORRECT);
+    }
+
     public static AptekaException productNotFound() {
         return new AptekaException(PRODUCT_NOT_FOUND);
     }
