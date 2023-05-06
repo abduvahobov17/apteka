@@ -12,6 +12,8 @@ public interface BucketService {
 
     PageDto<BucketDTO> getBuckets(BucketCriteria criteria, Pageable pageable);
 
+    BucketDTO completeOrder(Long bucketId);
+
     Optional<Bucket> getBucketByUserId(Long userId);
 
     Bucket save(Bucket bucket);

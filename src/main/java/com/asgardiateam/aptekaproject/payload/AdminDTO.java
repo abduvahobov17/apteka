@@ -16,4 +16,6 @@ public class AdminDTO {
     private String phone;
 
     private String login;
+
+    private String photoUrl;
 }

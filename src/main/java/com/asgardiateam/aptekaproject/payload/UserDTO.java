@@ -34,6 +34,8 @@ public class UserDTO {
 
     private String telegramId;
 
+    private Long orderAmount;
+
     private String phoneNumber;
 
     private String clientType;

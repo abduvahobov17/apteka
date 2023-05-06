@@ -25,6 +25,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(BAD_CREDENTIALS);
     }
 
+    public static AptekaException oldPasswordNotCorrect() {
+        return new AptekaException(OLD_PASSWORD_NOT_CORRECT);
+    }
+
     public static AptekaException productNotFound() {
         return new AptekaException(PRODUCT_NOT_FOUND);
     }
@@ -41,6 +45,10 @@ public class AptekaException extends RuntimeException {
         return new AptekaException(UNAUTHORIZED);
     }
 
+    public static AptekaException orderCannotBeConfirmed() {
+        return new AptekaException(ORDER_CANNOT_BE_CONFIRMED);
+    }
+
     public static AptekaException unitTypeNotValid() {
         return new AptekaException(UNIT_TYPE_NOT_VALID);
     }
@@ -55,6 +63,14 @@ public class AptekaException extends RuntimeException {
 
     public static AptekaException botStateNotValid() {
         return new AptekaException(BOT_STATE_NOT_VALID);
+    }
+
+    public static AptekaException newAndRepeatedPasswordDoesNotMatch() {
+        return new AptekaException(NEW_AND_REPEATED_PASSWORDS_DOES_NOT_MATCH);
+    }
+
+    public static AptekaException bucketStatusNotValid() {
+        return new AptekaException(BUCKET_STATUS_NOT_VALID);
     }
 
     public static AptekaException bucketProductNotFound() {

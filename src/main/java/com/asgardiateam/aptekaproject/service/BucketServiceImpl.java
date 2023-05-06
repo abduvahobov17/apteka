@@ -11,6 +11,7 @@ import com.asgardiateam.aptekaproject.mapper.BucketMapper;
 import com.asgardiateam.aptekaproject.payload.BucketDTO;
 import com.asgardiateam.aptekaproject.repository.BucketRepository;
 import com.asgardiateam.aptekaproject.service.interfaces.BucketService;
+import com.asgardiateam.aptekaproject.service.interfaces.UserService;
 import com.asgardiateam.aptekaproject.utils.Page2Dto;
 import com.asgardiateam.aptekaproject.utils.PageDto;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +35,28 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BucketServiceImpl implements BucketService {
 
-    private final BucketRepository bucketRepository;
+    private final UserService userService;
     private final BucketMapper bucketMapper;
+    private final BucketRepository bucketRepository;
 
     @Override
     public PageDto<BucketDTO> getBuckets(BucketCriteria criteria, Pageable pageable) {
         return Page2Dto.toDTO(findAll(criteria, pageable).map(bucketMapper::toDTO));
+    }
+
+    @Override
+    public BucketDTO completeOrder(Long bucketId) {
+        Bucket bucket = findById(bucketId);
+
+        if (!bucket.getBucketStatus().equals(BucketStatus.CONFIRMED))
+            throw AptekaException.orderCannotBeConfirmed();
+        bucket.setBucketStatus(BucketStatus.COMPLETED);
+
+        User user = bucket.getUser();
+        user.addAmountToOrderAmount(bucket.getOverallAmount());
+        userService.save(user);
+
+        return bucketMapper.toDTO(save(bucket));
     }
 
     @Override

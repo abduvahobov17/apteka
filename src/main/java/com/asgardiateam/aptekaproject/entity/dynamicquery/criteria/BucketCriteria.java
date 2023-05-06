@@ -1,6 +1,8 @@
 package com.asgardiateam.aptekaproject.entity.dynamicquery.criteria;
 
+import com.asgardiateam.aptekaproject.common.deserializer.BucketStatusDeserializer;
 import com.asgardiateam.aptekaproject.enums.BucketStatus;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +20,7 @@ public class BucketCriteria {
 
     private Instant toDate;
 
+    @JsonDeserialize(using = BucketStatusDeserializer.class)
     private BucketStatus bucketStatus;
 
     public BucketCriteria() {

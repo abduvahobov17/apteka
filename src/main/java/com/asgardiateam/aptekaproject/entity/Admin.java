@@ -32,6 +32,9 @@ public class Admin extends AuditingEntity implements UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "photo_url")
+    private String photoUrl;
+
     @Column(name = "email")
     private String email;
 

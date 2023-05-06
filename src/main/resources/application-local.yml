@@ -1,8 +1,8 @@
 asgardiateam:
   telegram:
     bot:
-      token: '6132565436:AAFIo4jysRetnG0GihnmCVmHGU1RV9lOabE'
-      username: '@aptekabeta_bot'
+      token: "5059171928:AAFpfNI9vYvm4dQG7opQ_FgrceK6MovIlf0"
+      username: "@housetinchlik_bot"
 
 spring:
   datasource:
@@ -14,3 +14,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+minio:
+  bucket-name: "apteka-bot"
+  login: "Abdurauf"
+  password: "17042004Abdu"
+  url: "http://localhost:9000"

@@ -4,6 +4,7 @@ import com.asgardiateam.aptekaproject.service.interfaces.BotService;
 import com.asgardiateam.aptekaproject.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,14 +16,20 @@ public class TelegramController extends TelegramLongPollingBot {
     private final BotService botService;
     private final UserService userService;
 
+    @Value("${asgardiateam.telegram.bot.username}")
+    private String botUsername;
+
+    @Value("${asgardiateam.telegram.bot.token}")
+    private String botToken;
+
     @Override
     public String getBotUsername() {
-        return "@aptekabeta_bot";
+        return botUsername;
     }
 
     @Override
     public String getBotToken() {
-        return "6132565436:AAFIo4jysRetnG0GihnmCVmHGU1RV9lOabE";
+        return botToken;
     }
 
     @SneakyThrows

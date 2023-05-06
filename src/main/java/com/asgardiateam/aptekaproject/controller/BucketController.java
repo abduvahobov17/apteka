@@ -10,9 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Base64;
 import java.util.List;
@@ -32,6 +30,11 @@ public class BucketController {
     public Object getAll(@PageableDefault(sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable,
                          BucketCriteria criteria) {
         return ok(bucketService.getBuckets(criteria, pageable));
+    }
+
+    @PutMapping(COMPLETE + "/{bucketId}")
+    public Object completeOrder(@PathVariable Long bucketId) {
+        return ok(bucketService.completeOrder(bucketId));
     }
 
     @GetMapping(EXCEL)
