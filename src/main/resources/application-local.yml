@@ -14,3 +14,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+minio:
+  bucket-name: "apteka-bot"
+  login: "Abdurauf"
+  password: "17042004Abdu"
+  url: "http://localhost:9000"

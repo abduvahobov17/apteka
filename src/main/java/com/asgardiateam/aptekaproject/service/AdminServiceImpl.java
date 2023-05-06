@@ -6,9 +6,11 @@ import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.asgardiateam.aptekaproject.mapper.AdminMapper;
 import com.asgardiateam.aptekaproject.payload.AdminDTO;
 import com.asgardiateam.aptekaproject.payload.ChangePasswordRequest;
+import com.asgardiateam.aptekaproject.payload.PhotoUpdateRequest;
 import com.asgardiateam.aptekaproject.payload.request.AdminRequest;
 import com.asgardiateam.aptekaproject.repository.AdminRepository;
 import com.asgardiateam.aptekaproject.service.interfaces.AdminService;
+import com.asgardiateam.aptekaproject.service.interfaces.MinioFileUploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Log4j2
 @Service
@@ -25,6 +28,7 @@ import java.util.Optional;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
+    private final MinioFileUploader fileUploader;
     private final AdminRepository adminRepository;
 
     @Override
@@ -39,14 +43,24 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public AdminDTO getMe() {
-        return adminMapper.toDTO(ThreadLocalSingleton.getUser());
+        Admin admin = ThreadLocalSingleton.getUser();
+        return adminMapper.toDTO(ThreadLocalSingleton.getUser(), fileUploader.getTempUrl(admin.getPhotoUrl(), "apteka-bot"));
     }
 
     @Override
     public AdminDTO updateMe(AdminRequest request) {
         Admin admin = ThreadLocalSingleton.getUser();
         admin = adminMapper.toUpdate(request, admin);
-        return adminMapper.toDTO(save(admin));
+        return adminMapper.toDTO(save(admin), fileUploader.getTempUrl(admin.getPhotoUrl(), "apteka-bot"));
+    }
+
+    @Override
+    public AdminDTO updatePhoto(PhotoUpdateRequest request) {
+        Admin admin = ThreadLocalSingleton.getUser();
+        String objectName = request.getTitle().replaceAll("\\s+", "_").toLowerCase() + "-" + UUID.randomUUID();
+        objectName = fileUploader.upload("apteka-bot", request.getFile(), objectName);
+        admin.setPhotoUrl(objectName);
+        return adminMapper.toDTO(admin, fileUploader.getTempUrl(admin.getPhotoUrl(), "apteka-bot"));
     }
 
     public Admin save(Admin admin) {

@@ -5,6 +5,8 @@ import com.asgardiateam.aptekaproject.entity.Admin;
 import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.asgardiateam.aptekaproject.mapper.AdminMapper;
 import com.asgardiateam.aptekaproject.payload.ChangePasswordRequest;
+import com.asgardiateam.aptekaproject.payload.MessageDTO;
+import com.asgardiateam.aptekaproject.payload.PhotoUpdateRequest;
 import com.asgardiateam.aptekaproject.payload.request.AdminRequest;
 import com.asgardiateam.aptekaproject.service.interfaces.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 import static com.asgardiateam.aptekaproject.common.ResponseData.ok;
+import static com.asgardiateam.aptekaproject.constants.MessageKey.SUCCESS_MESSAGE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @Log4j2
 @RestController
@@ -59,6 +63,11 @@ public class AdminController {
         admin.setPassword(passwordEncoder.encode(request.getNewPassword()));
         adminService.save(admin);
 
-        return adminMapper.toDTO(admin);
+        return ok(new MessageDTO(SUCCESS_MESSAGE));
+    }
+
+    @PutMapping(value = "/photo", consumes = MULTIPART_FORM_DATA_VALUE)
+    public Object updateMyPhoto(@ModelAttribute @Valid PhotoUpdateRequest request) {
+        return ok(adminService.updatePhoto(request));
     }
 }

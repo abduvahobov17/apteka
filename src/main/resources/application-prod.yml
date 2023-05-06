@@ -14,3 +14,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+minio:
+  bucket-name: "apteka-bot"
+  login: "apteka-bot"
+  password: "Z0900QcJxmFFbYm1JtKSNEjVS4HDMqsU"
+  url: "https://bucket.minio.asgardia.uz"
