@@ -60,6 +60,7 @@ public class AdminServiceImpl implements AdminService {
         String objectName = request.getTitle().replaceAll("\\s+", "_").toLowerCase() + "-" + UUID.randomUUID();
         objectName = fileUploader.upload("apteka-bot", request.getFile(), objectName);
         admin.setPhotoUrl(objectName);
+        adminRepository.save(admin);
         return adminMapper.toDTO(admin, fileUploader.getTempUrl(admin.getPhotoUrl(), "apteka-bot"));
     }
 
