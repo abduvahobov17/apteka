@@ -6,13 +6,14 @@ import com.asgardiateam.aptekaproject.enums.State;
 import com.asgardiateam.aptekaproject.enums.UnitType;
 import org.springframework.data.jpa.domain.Specification;
 
+import static com.asgardiateam.aptekaproject.utils.Utils.*;
 import static java.util.Objects.nonNull;
 
 public final class ProductSpecifications {
 
     public static Specification<Product> createSpecifications(ProductCriteria productCriteria) {
         return idLikeTo(productCriteria.getId())
-                .and(nameLikeTo(productCriteria.getName()))
+                .and(nameLikeTo(productCriteria.getName()).or(nameLikeToKir(productCriteria.getName())).or(nameLikeToKLat(productCriteria.getName())))
                 .and(amountAround(productCriteria.getFromAmount(), productCriteria.getToAmount()))
                 .and(descriptionLikeTo(productCriteria.getDescription()))
                 .and(priceAround(productCriteria.getFromPrice(), productCriteria.getToPrice()))
@@ -27,7 +28,17 @@ public final class ProductSpecifications {
 
     public static Specification<Product> nameLikeTo(String name) {
         return (root, query, criteriaBuilder) -> nonNull(name) ?
-                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), '%' + name.toLowerCase() + '%') : null;
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), '%' + buildLike(name.toLowerCase()) + '%') : null;
+    }
+
+    public static Specification<Product> nameLikeToKir(String name) {
+        return (root, query, criteriaBuilder) -> nonNull(name) ?
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), '%' + buildLike(toCyrillic(name.toLowerCase())) + '%') : null;
+    }
+
+    public static Specification<Product> nameLikeToKLat(String name) {
+        return (root, query, criteriaBuilder) -> nonNull(name) ?
+                criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), '%' +buildLike(toLatin(name.toLowerCase())) + '%') : null;
     }
 
     public static Specification<Product> amountAround(Long fromAmount, Long toAmount) {
@@ -55,4 +66,5 @@ public final class ProductSpecifications {
     public static Specification<Product> stateEquals() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("state"), State.ALIVE);
     }
+
 }

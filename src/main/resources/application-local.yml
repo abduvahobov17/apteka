@@ -3,6 +3,7 @@ asgardiateam:
     bot:
       token: "5059171928:AAFpfNI9vYvm4dQG7opQ_FgrceK6MovIlf0"
       username: "@housetinchlik_bot"
+      path: "https://8d3b-185-230-206-11.ngrok-free.app/telegram"
 
 spring:
   datasource:

@@ -79,7 +79,7 @@ public class BotServiceImpl implements BotService {
             return sendMessageMethods.get(user.getBotState()).apply(update, user);
     }
 
-    public SendMessage greet(Update update, User user) {
+    public BotApiMethod<? extends Serializable> greet(Update update, User user) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(getChatId(update));
 
