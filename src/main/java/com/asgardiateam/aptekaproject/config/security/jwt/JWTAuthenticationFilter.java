@@ -64,7 +64,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     String token = request.getHeader(HeaderConstants.AUTHORIZATION);
                     if (Objects.nonNull(token) && token.startsWith("Bearer") && token.length() > 8)
                         return token.substring(7);
-                    throw AptekaException.unauthorized();
+                    return null;
                 })
                 .onFailure(log::error)
                 .getOrNull();

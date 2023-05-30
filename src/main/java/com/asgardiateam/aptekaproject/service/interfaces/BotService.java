@@ -11,6 +11,6 @@ public interface BotService {
 
     BotApiMethod<? extends Serializable> executeMethod(Update update, User user);
 
-    SendMessage greet(Update update, User user);
+    BotApiMethod<? extends Serializable> greet(Update update, User user);
 
 }
