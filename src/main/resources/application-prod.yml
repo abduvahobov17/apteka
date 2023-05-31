@@ -3,7 +3,7 @@ asgardiateam:
     bot:
       token: "6132565436:AAFIo4jysRetnG0GihnmCVmHGU1RV9lOabE"
       username: "@aptekabeta_bot"
-      path: "https://apteka.asgardia.uz/telegram/telegram";
+      path: "https://apteka.asgardia.uz/telegram"
 
 spring:
   datasource:
