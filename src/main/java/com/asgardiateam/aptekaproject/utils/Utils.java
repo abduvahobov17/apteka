@@ -1,8 +1,9 @@
 package com.asgardiateam.aptekaproject.utils;
 
+import com.asgardiateam.aptekaproject.exception.AptekaException;
 import com.ibm.icu.text.Transliterator;
 
-public class Utils {
+public final class Utils {
 
     public static final String CYRILLIC_TO_LATIN = "Cyrillic-Latin";
     public static final String LATIN_TO_CYRILLIC = "Latin-Cyrillic";
@@ -25,5 +26,9 @@ public class Utils {
             result.append(name.charAt(i)).append("%");
         }
         return result.append(name.charAt(name.length() - 1)).toString();
+    }
+
+    private Utils() {
+        throw new AptekaException("Utility class");
     }
 }
